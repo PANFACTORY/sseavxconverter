@@ -1,3 +1,33 @@
+interface Token {
+    kind : string;
+    value : string;
+}
+
+//  string -> token[]
+const Lexical = (_str : string) : Token[] => {
+    let out : Token[] = [];
+    for(let i = 0; i < _str.length;) {
+        if (!_str[i]) {                             //  空白なら読み飛ばす
+            ++i;
+        } else if (_str[i].match(/[()+\-*/]/)) {     //  演算子のとき
+            out.push({ kind : "operator", value : _str[i] });
+            ++i;
+        } else {                                    //  変数もしくは数値のとき
+            let token : Token = { kind : "", value : "" };
+            for (; i < _str.length && !_str[i].match(/[()+\-*/]/); ++i) {
+                token.value += _str[i];
+            }
+            if (token.value.match(/\d+(?:\.\d+)?/)) {
+                token.kind = "number";
+            } else {
+                token.kind = "string";
+            }
+            out.push(token);
+        }
+    }
+    return out;
+}
+
 const Order = (_ch : string) : number => {
     switch (_ch) {
     case '*': case '/': return 3;
@@ -7,59 +37,61 @@ const Order = (_ch : string) : number => {
     return -1;
 }
 
-const Polish = (_str : string) : string => {
-    let out : string = "";
-    const stack : string[] = [];
-    let wk : string;
-    for(let i = 0; i < _str.length; ++i) {
-        if (!_str[i]) {                             //  空白なら読み飛ばす
-            continue;
-        } else if (_str[i].match(/^[a-zA-Z]+$/)) {  //  変数のとき
-            out += _str[i]; //  2文字以上の変数名に対応したい
-        } else if (_str[i].match(/^[0-9]+$/)) {     //  数値のとき
-            out += _str[i]; //  実数に対応したい
-        } else if (_str[i].match(/^\($/)) {         //  '('のとき
-            stack.push('(');
-        } else if (_str[i].match(/^\)$/)) {         //  ')'のとき
-            wk = stack.pop();
-            while(!wk.match(/^\($/)) {
-                if (!stack.length) {
-                    console.log("'('が不足しています");
-                    break;  //  例外を投げる様に変更したい
+//  token[](infix notation) -> token[](postfix notation)
+const Polish = (_eqn : Token[]) : Token[] => {
+    let out : Token[] = [];
+    const stack : Token[] = [];
+    for(let i = 0; i < _eqn.length; ++i) {
+        if (_eqn[i].kind === "string" || _eqn[i].kind === "number") {   //  変数または実数のとき
+            out.push(_eqn[i]);
+        } else if (_eqn[i].kind === "operator") {                       //  演算子のとき
+            if (_eqn[i].value === '(') {
+                stack.push(_eqn[i]);
+            } else if (_eqn[i].value === ')') {
+                let wk : Token = stack.pop();
+                while(wk.value !== '(') {
+                    if (!stack.length) {
+                        console.log("'('が不足しています");
+                        break;  //  例外を投げる様に変更したい
+                    }
+                    out.push(wk);
+                    wk = stack.pop();
                 }
-                out += wk;
-                wk = stack.pop();
+            } else {
+                while (stack.length && Order(stack[stack.length - 1].value) >= Order(_eqn[i].value)) {
+                    out.push(stack.pop());
+                }
+                stack.push(_eqn[i]);
             }
-        } else {                                    //  演算子のとき
-            while (stack.length && Order(stack[stack.length - 1]) >= Order(_str[i])) {
-                out += stack.pop();
-            }
-            stack.push(_str[i]);
+        } else {
+            console.log("予期せぬトークンです");
+            continue;   //  例外を投げる様にしたい
         }
     }
     while (stack.length) {
-        wk = stack.pop();
-        if (wk.match(/^\($/)) {
+        let wk : Token = stack.pop();
+        if (wk.value === '(') {
             console.log("'('が余分です");
             break;  //  例外を投げる様に変更したい
         }
-        out += wk;
+        out.push(wk);
     }
     return out;
 }
 
-const AVX = (_str : string) : string => {
+//  token[] -> string
+const AVX = (_eqn : Token[]) : string => {
     let d1 : string, d2 : string;
     const stack : string[] = [];
-    for (let i = 0; i < _str.length; ++i) {
-        if (_str[i].match(/^[a-zA-Z]+$/)) {
-            stack.push(_str[i]);
-        } else if (_str[i].match(/^[0-9]+$/)) {
-            stack.push(`_mm256_set1_pd(${_str[i]})` );
+    for (let i = 0; i < _eqn.length; ++i) {
+        if (_eqn[i].kind === "string") {
+            stack.push(_eqn[i].value);
+        } else if (_eqn[i].kind === "number") {
+            stack.push(`_mm256_set1_pd(${_eqn[i].value})` );
         } else {
             d2 = stack.pop();
             d1 = stack.pop();
-            switch (_str[i]) {
+            switch (_eqn[i].value) {
             case '+': stack.push(`_mm256_add_pd(${d1}, ${d2})`); break;
             case '-': stack.push(`_mm256_sub_pd(${d1}, ${d2})`); break;
             case '*': stack.push(`_mm256_mul_pd(${d1}, ${d2})`); break;
@@ -73,4 +105,4 @@ const AVX = (_str : string) : string => {
     return stack.pop();
 }
 
-console.log(AVX(Polish("(a+3*b)*c")));
+console.log(AVX(Polish(Lexical("(_a[i]+3.0*_b[i])*c[i]"))));
