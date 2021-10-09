@@ -55,15 +55,15 @@ const AVX = (_str : string) : string => {
         if (_str[i].match(/^[a-zA-Z]+$/)) {
             stack.push(_str[i]);
         } else if (_str[i].match(/^[0-9]+$/)) {
-            stack.push(_str[i]);
+            stack.push(`_mm256_set1_pd(${_str[i]})` );
         } else {
             d2 = stack.pop();
             d1 = stack.pop();
             switch (_str[i]) {
-            case '+': stack.push("_mm256_add_pd(" + d1 + ", " + d2 + ")"); break;
-            case '-': stack.push("_mm256_sub_pd(" + d1 + ", " + d2 + ")"); break;
-            case '*': stack.push("_mm256_mul_pd(" + d1 + ", " + d2 + ")"); break;
-            case '/': stack.push("_mm256_div_pd(" + d1 + ", " + d2 + ")"); break;
+            case '+': stack.push(`_mm256_add_pd(${d1}, ${d2})`); break;
+            case '-': stack.push(`_mm256_sub_pd(${d1}, ${d2})`); break;
+            case '*': stack.push(`_mm256_mul_pd(${d1}, ${d2})`); break;
+            case '/': stack.push(`_mm256_div_pd(${d1}, ${d2})`); break;
             }
         }
     }
@@ -73,4 +73,4 @@ const AVX = (_str : string) : string => {
     return stack.pop();
 }
 
-console.log(AVX(Polish("(a+b)*c")));
+console.log(AVX(Polish("(a+3*b)*c")));
