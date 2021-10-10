@@ -2,17 +2,38 @@
 <html>
 <head>
     <meta charset="utf-8">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
     <title>SSE/AVX converter</title>
 </head>
 <body>
-    <div>
-        <input type="text" id="input_equation" />
-    </div>
+    <nav class="navbar navbar-dark bg-dark">
+        <a href="#" class="navbar-brand">SSE/AVX converter</a>
+    </nav>
 
-    <div>
-        <input type="text" id="output_equation" />
-    </div>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col">
+                <div class="card border-secondary m-5">
+                    <div class="card-body">
+                      <h5 class="card-title">Original equation</h5>
+                    </div>
+                    <input type="text" class="card-text" id="input_equation" />
+                </div>
+            </div>
+        </div>
 
+        <div class="row">
+            <div class="col">
+                <div class="card border-secondary mx-5">
+                    <div class="card-body">
+                        <h5 class="card-title">SSE/AVX intrinsic</h5>
+                    </div>
+                    <textarea id="output_equation" class="card-text form-control" readonly></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <script src="main.js"></script>
 </body>
 </html>
