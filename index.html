@@ -13,7 +13,53 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col">
-                <div class="card border-secondary m-5">
+                <div class="card border-secondary m-5 p-2">
+                    <div class="card-body">
+                        <h5 class="card-title">SSE/AVX/AVX2/AVX512</h5>
+                    </div>
+                    <form class="form-inline">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" id="radio_sse">
+                            <label class="form-check-label card-text" for="radio_sse">SSE</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" id="radio_avx" checked>
+                            <label class="form-check-label card-text" for="radio_avx">AVX/AVX2</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" id="radio_avx512">
+                            <label class="form-check-label card-text" for="radio_avx512">AVX512</label>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="card border-secondary m-5 p-2">
+                    <div class="card-body">
+                        <h5 class="card-title">Data type</h5>
+                    </div>
+                    <form class="form-inline">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" id="radio_int">
+                            <label class="form-check-label card-text" for="radio_int">int</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" id="radio_float">
+                            <label class="form-check-label card-text" for="radio_float">float</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" id="radio_double" checked>
+                            <label class="form-check-label card-text" for="radio_double">double</label>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col">
+                <div class="card border-secondary mx-5 p-2">
                     <div class="card-body">
                       <h5 class="card-title">Original equation</h5>
                     </div>
@@ -24,7 +70,7 @@
 
         <div class="row">
             <div class="col">
-                <div class="card border-secondary mx-5">
+                <div class="card border-secondary m-5 p-2">
                     <div class="card-body">
                         <h5 class="card-title">SSE/AVX intrinsic</h5>
                     </div>
