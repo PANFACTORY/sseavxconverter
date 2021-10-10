@@ -139,3 +139,7 @@ var onChange = function (event) {
 $form_sseavx.addEventListener('change', onChange);
 $form_type.addEventListener('change', onChange);
 $input_equation.addEventListener('change', onChange);
+var $button_copy = document.getElementById('button_copy');
+$button_copy.addEventListener('click', function (event) {
+    navigator.clipboard.writeText($output_equation.value);
+});
