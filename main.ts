@@ -9,8 +9,12 @@ const Lexical = (_str : string) : Token[] => {
     for(let i = 0; i < _str.length;) {
         if (!_str[i]) {                             //  空白なら読み飛ばす
             ++i;
-        } else if (_str[i].match(/[()+\-*/]/)) {     //  演算子のとき
-            out.push({ kind : "operator", value : _str[i] });
+        } else if (_str[i].match(/[()+\-*/]/)) {    //  符号もしくは演算子のとき
+            if (_str[i] === '-' && (out.length === 0 || out[out.length - 1].kind === "operator")) {
+                out.push({ kind : "operator", value : '_' });
+            } else {
+                out.push({ kind : "operator", value : _str[i] });
+            }
             ++i;
         } else {                                    //  変数もしくは数値のとき
             let token : Token = { kind : "", value : "" };
@@ -30,6 +34,7 @@ const Lexical = (_str : string) : Token[] => {
 
 const Order = (_ch : string) : number => {
     switch (_ch) {
+    case '_':           return 4;
     case '*': case '/': return 3;
     case '+': case '-': return 2;
     case '(':           return 1;
@@ -90,12 +95,16 @@ const AVX = (_eqn : Token[]) : string => {
             stack.push(`_mm256_set1_pd(${_eqn[i].value})` );
         } else {
             d2 = stack.pop();
-            d1 = stack.pop();
-            switch (_eqn[i].value) {
-            case '+': stack.push(`_mm256_add_pd(${d1}, ${d2})`); break;
-            case '-': stack.push(`_mm256_sub_pd(${d1}, ${d2})`); break;
-            case '*': stack.push(`_mm256_mul_pd(${d1}, ${d2})`); break;
-            case '/': stack.push(`_mm256_div_pd(${d1}, ${d2})`); break;
+            if (_eqn[i].value === '_') {
+                stack.push(`_mm256_mul_pd(_mm256_set1_pd(-1.0), ${d2})`);
+            } else {
+                d1 = stack.pop();
+                switch (_eqn[i].value) {
+                case '+': stack.push(`_mm256_add_pd(${d1}, ${d2})`); break;
+                case '-': stack.push(`_mm256_sub_pd(${d1}, ${d2})`); break;
+                case '*': stack.push(`_mm256_mul_pd(${d1}, ${d2})`); break;
+                case '/': stack.push(`_mm256_div_pd(${d1}, ${d2})`); break;
+                }
             }
         }
     }
@@ -105,4 +114,4 @@ const AVX = (_eqn : Token[]) : string => {
     return stack.pop();
 }
 
-console.log(AVX(Polish(Lexical("(_a[i]+3.0*_b[i])*c[i]"))));
+console.log(AVX(Polish(Lexical("(-_a[i]+3.0*_b[i])*c[i]"))));
