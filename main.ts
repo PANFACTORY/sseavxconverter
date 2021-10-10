@@ -106,7 +106,7 @@ const SSEAVX = (_eqn : Token[], _sseavx : string, _type : string) : string => {
         }
     }
     if (stack.length != 1) {
-        throw new Error("Error at AVX");
+        throw new Error("Error at AVX : May be invalid equation.");
     }
     return stack.pop();
 }
