@@ -114,4 +114,4 @@ const AVX = (_eqn : Token[]) : string => {
     return stack.pop();
 }
 
-console.log(AVX(Polish(Lexical("(-_a[i]+3.0*_b[i])*c[i]"))));
+console.log(AVX(Polish(Lexical("(_a[i]+3.0*_b[i])*(-c[i])"))));
