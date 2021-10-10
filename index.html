@@ -13,44 +13,46 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col">
-                <div class="card border-secondary m-5 p-2">
+                <div class="card border-secondary my-4 ml-4 mr-2 p-2">
                     <div class="card-body">
                         <h5 class="card-title">SSE/AVX/AVX2/AVX512</h5>
                     </div>
+                    <p class="card-text">Select SIMD extension you use.</p>
                     <form class="form-inline" id="form_sseavx">
-                        <div class="form-check">
+                        <div class="form-check form-check-inline">
                             <input class="form-check-input" type="radio" name="radio_sseavx" id="radio_sse" value="">
-                            <label class="form-check-label card-text" for="radio_sse">SSE</label>
+                            <label class="form-check-label" for="radio_sse">SSE</label>
                         </div>
-                        <div class="form-check">
+                        <div class="form-check form-check-inline">
                             <input class="form-check-input" type="radio" name="radio_sseavx" id="radio_avx" value="256" checked>
-                            <label class="form-check-label card-text" for="radio_avx">AVX/AVX2</label>
+                            <label class="form-check-label" for="radio_avx">AVX/AVX2</label>
                         </div>
-                        <div class="form-check">
+                        <div class="form-check form-check-inline">
                             <input class="form-check-input" type="radio" name="radio_sseavx" id="radio_avx512" value="512">
-                            <label class="form-check-label card-text" for="radio_avx512">AVX512</label>
+                            <label class="form-check-label" for="radio_avx512">AVX512</label>
                         </div>
                     </form>
                 </div>
             </div>
 
             <div class="col">
-                <div class="card border-secondary m-5 p-2">
+                <div class="card border-secondary my-4 ml-2 mr-4 p-2">
                     <div class="card-body">
                         <h5 class="card-title">Data type</h5>
                     </div>
+                    <p class="card-text">Select data type you use.</p>
                     <form class="form-inline" id="form_type">
-                        <div class="form-check">
+                        <div class="form-check form-check-inline">
                             <input class="form-check-input" type="radio" name="radio_type" id="radio_int" value="si128">
-                            <label class="form-check-label card-text" for="radio_int">int</label>
+                            <label class="form-check-label" for="radio_int">int</label>
                         </div>
-                        <div class="form-check">
+                        <div class="form-check form-check-inline">
                             <input class="form-check-input" type="radio" name="radio_type" id="radio_float" value="ps">
-                            <label class="form-check-label card-text" for="radio_float">float</label>
+                            <label class="form-check-label" for="radio_float">float</label>
                         </div>
-                        <div class="form-check">
+                        <div class="form-check form-check-inline">
                             <input class="form-check-input" type="radio" name="radio_type" id="radio_double" value="pd" checked>
-                            <label class="form-check-label card-text" for="radio_double">double</label>
+                            <label class="form-check-label" for="radio_double">double</label>
                         </div>
                     </form>
                 </div>
@@ -59,10 +61,11 @@
 
         <div class="row">
             <div class="col">
-                <div class="card border-secondary mx-5 p-2">
+                <div class="card border-secondary mx-4 p-2">
                     <div class="card-body">
-                      <h5 class="card-title">Original equation</h5>
+                        <h5 class="card-title">Original equation</h5>
                     </div>
+                    <p class="card-text">Input your equation with infix notation.</p>
                     <input type="text" class="card-text" id="input_equation" />
                 </div>
             </div>
@@ -70,11 +73,12 @@
 
         <div class="row">
             <div class="col">
-                <div class="card border-secondary m-5 p-2">
+                <div class="card border-secondary m-4 p-2">
                     <div class="card-body">
                         <h5 class="card-title">SSE/AVX intrinsic</h5>
                     </div>
                     <textarea id="output_equation" class="card-text form-control" readonly></textarea>
+                    <button type="button" class="btn btn-outline-primary mt-2" id="button_copy">Copy</button>
                 </div>
             </div>
         </div>
