@@ -82,7 +82,7 @@ const Polish = (_eqn : Token[]) : Token[] => {
 }
 
 //  token[] -> string
-const AVX = (_eqn : Token[]) : string => {
+const SSEAVX = (_eqn : Token[]) : string => {
     let d1 : string, d2 : string;
     const stack : string[] = [];
     for (let i = 0; i < _eqn.length; ++i) {
@@ -111,4 +111,13 @@ const AVX = (_eqn : Token[]) : string => {
     return stack.pop();
 }
 
-console.log(AVX(Polish(Lexical("(_a[i]+3.0*_b[i])*(-c[i])"))));
+//  About HTML
+const $input_equation : HTMLInputElement = <HTMLInputElement>document.getElementById('input_equation');
+const $output_equation : HTMLInputElement = <HTMLInputElement>document.getElementById('output_equation');
+$input_equation.addEventListener('change', (event) => {
+    try {
+        $output_equation.value = SSEAVX(Polish(Lexical($input_equation.value)));
+    } catch (e) {
+        alert(e);
+    }
+});
