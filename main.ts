@@ -56,8 +56,7 @@ const Polish = (_eqn : Token[]) : Token[] => {
                 let wk : Token = stack.pop();
                 while(wk.value !== '(') {
                     if (!stack.length) {
-                        console.log("'('が不足しています");
-                        break;  //  例外を投げる様に変更したい
+                        throw new Error("Error at Polish : '(' is missing.");
                     }
                     out.push(wk);
                     wk = stack.pop();
@@ -69,15 +68,13 @@ const Polish = (_eqn : Token[]) : Token[] => {
                 stack.push(_eqn[i]);
             }
         } else {
-            console.log("予期せぬトークンです");
-            continue;   //  例外を投げる様にしたい
+            throw new Error("Error at Polish : Unexpected token.");
         }
     }
     while (stack.length) {
         let wk : Token = stack.pop();
         if (wk.value === '(') {
-            console.log("'('が余分です");
-            break;  //  例外を投げる様に変更したい
+            throw new Error("Error '(' is extra.");
         }
         out.push(wk);
     }
@@ -109,7 +106,7 @@ const AVX = (_eqn : Token[]) : string => {
         }
     }
     if (stack.length != 1) {
-        console.log("エラー");
+        throw new Error("Error at AVX");
     }
     return stack.pop();
 }
