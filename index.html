@@ -17,17 +17,17 @@
                     <div class="card-body">
                         <h5 class="card-title">SSE/AVX/AVX2/AVX512</h5>
                     </div>
-                    <form class="form-inline">
+                    <form class="form-inline" id="form_sseavx">
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" id="radio_sse">
+                            <input class="form-check-input" type="radio" name="radio_sseavx" id="radio_sse" value="">
                             <label class="form-check-label card-text" for="radio_sse">SSE</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" id="radio_avx" checked>
+                            <input class="form-check-input" type="radio" name="radio_sseavx" id="radio_avx" value="256" checked>
                             <label class="form-check-label card-text" for="radio_avx">AVX/AVX2</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" id="radio_avx512">
+                            <input class="form-check-input" type="radio" name="radio_sseavx" id="radio_avx512" value="512">
                             <label class="form-check-label card-text" for="radio_avx512">AVX512</label>
                         </div>
                     </form>
@@ -39,17 +39,17 @@
                     <div class="card-body">
                         <h5 class="card-title">Data type</h5>
                     </div>
-                    <form class="form-inline">
+                    <form class="form-inline" id="form_type">
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" id="radio_int">
+                            <input class="form-check-input" type="radio" name="radio_type" id="radio_int" value="si128">
                             <label class="form-check-label card-text" for="radio_int">int</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" id="radio_float">
+                            <input class="form-check-input" type="radio" name="radio_type" id="radio_float" value="ps">
                             <label class="form-check-label card-text" for="radio_float">float</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" id="radio_double" checked>
+                            <input class="form-check-input" type="radio" name="radio_type" id="radio_double" value="pd" checked>
                             <label class="form-check-label card-text" for="radio_double">double</label>
                         </div>
                     </form>

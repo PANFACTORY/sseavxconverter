@@ -84,7 +84,7 @@ var Polish = function (_eqn) {
     return out;
 };
 //  token[] -> string
-var SSEAVX = function (_eqn) {
+var SSEAVX = function (_eqn, _sseavx, _type) {
     var d1, d2;
     var stack = [];
     for (var i = 0; i < _eqn.length; ++i) {
@@ -92,27 +92,27 @@ var SSEAVX = function (_eqn) {
             stack.push(_eqn[i].value);
         }
         else if (_eqn[i].kind === "number") {
-            stack.push("_mm256_set1_pd(" + _eqn[i].value + ")");
+            stack.push("_mm" + _sseavx + "_set1_" + _type + "(" + _eqn[i].value + ")");
         }
         else {
             d2 = stack.pop();
             if (_eqn[i].value === '_') {
-                stack.push("_mm256_mul_pd(_mm256_set1_pd(-1.0), " + d2 + ")");
+                stack.push("_mm" + _sseavx + "_mul_" + _type + "(_mm" + _sseavx + "_set1_" + _type + "(-1.0), " + d2 + ")");
             }
             else {
                 d1 = stack.pop();
                 switch (_eqn[i].value) {
                     case '+':
-                        stack.push("_mm256_add_pd(" + d1 + ", " + d2 + ")");
+                        stack.push("_mm" + _sseavx + "_add_" + _type + "(" + d1 + ", " + d2 + ")");
                         break;
                     case '-':
-                        stack.push("_mm256_sub_pd(" + d1 + ", " + d2 + ")");
+                        stack.push("_mm" + _sseavx + "_sub_" + _type + "(" + d1 + ", " + d2 + ")");
                         break;
                     case '*':
-                        stack.push("_mm256_mul_pd(" + d1 + ", " + d2 + ")");
+                        stack.push("_mm" + _sseavx + "_mul_" + _type + "(" + d1 + ", " + d2 + ")");
                         break;
                     case '/':
-                        stack.push("_mm256_div_pd(" + d1 + ", " + d2 + ")");
+                        stack.push("_mm" + _sseavx + "_div_" + _type + "(" + d1 + ", " + d2 + ")");
                         break;
                 }
             }
@@ -124,13 +124,18 @@ var SSEAVX = function (_eqn) {
     return stack.pop();
 };
 //  About HTML
+var $form_sseavx = document.getElementById('form_sseavx');
+var $form_type = document.getElementById('form_type');
 var $input_equation = document.getElementById('input_equation');
 var $output_equation = document.getElementById('output_equation');
-$input_equation.addEventListener('change', function (event) {
+var onChange = function (event) {
     try {
-        $output_equation.value = SSEAVX(Polish(Lexical($input_equation.value)));
+        $output_equation.value = SSEAVX(Polish(Lexical($input_equation.value)), $form_sseavx.elements['radio_sseavx'].value, $form_type.elements['radio_type'].value);
     }
     catch (e) {
         alert(e);
     }
-});
+};
+$form_sseavx.addEventListener('change', onChange);
+$form_type.addEventListener('change', onChange);
+$input_equation.addEventListener('change', onChange);
