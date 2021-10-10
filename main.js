@@ -119,7 +119,7 @@ var SSEAVX = function (_eqn, _sseavx, _type) {
         }
     }
     if (stack.length != 1) {
-        throw new Error("Error at AVX");
+        throw new Error("Error at SSEAVX");
     }
     return stack.pop();
 };
