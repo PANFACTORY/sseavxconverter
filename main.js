@@ -92,7 +92,13 @@ var SSEAVX = function (_eqn, _sseavx, _type) {
             stack.push(_eqn[i].value);
         }
         else if (_eqn[i].kind === "number") {
-            stack.push("_mm" + _sseavx + "_set1_" + _type + "(" + _eqn[i].value + ")");
+            if (i + 1 < _eqn.length && _eqn[i + 1].value === '_') {
+                stack.push("_mm" + _sseavx + "_set1_" + _type + "(-" + _eqn[i].value + ")");
+                ++i;
+            }
+            else {
+                stack.push("_mm" + _sseavx + "_set1_" + _type + "(" + _eqn[i].value + ")");
+            }
         }
         else {
             d2 = stack.pop();
