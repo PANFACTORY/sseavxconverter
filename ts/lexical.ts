@@ -1,6 +1,7 @@
 interface Token {
     kind : string;
     value : string;
+    children : Token[];
 }
 
 //  string -> token[]
@@ -11,13 +12,13 @@ const Lexical = (_str : string) : Token[] => {
             ++i;
         } else if (_str[i].match(/[()+\-*/]/)) {    //  符号もしくは演算子のとき
             if (_str[i] === '-' && (out.length === 0 || out[out.length - 1].kind === "operator")) {
-                out.push({ kind : "operator", value : '_' });
+                out.push({ kind : "operator", value : '_', children : [] });
             } else {
-                out.push({ kind : "operator", value : _str[i] });
+                out.push({ kind : "operator", value : _str[i], children : [] });
             }
             ++i;
         } else {                                    //  変数もしくは数値のとき
-            let token : Token = { kind : "", value : "" };
+            let token : Token = { kind : "", value : "", children : [] };
             for (; i < _str.length && !_str[i].match(/[()+\-*/]/); ++i) {
                 token.value += _str[i];
             }

@@ -1,5 +1,6 @@
 /// <reference path="lexical.ts">
 /// <reference path="syntaxtree.ts">
+/// <reference path="sseavx.ts">
 //  About HTML
 var $form_sseavx = document.getElementById('form_sseavx');
 var $form_type = document.getElementById('form_type');
@@ -9,7 +10,7 @@ var onChange = function (event) {
     var token = Lexical($input_equation.value);
     try {
         var generator = new SyntaxTreeGenerator(token, $form_sseavx.elements['radio_sseavx'].value, $form_type.elements['radio_type'].value);
-        $output_equation.value = generator.stack[0];
+        $output_equation.value = SSEAVX(generator.stack[0]);
     }
     catch (e) {
         alert(e);
@@ -31,15 +32,15 @@ var Lexical = function (_str) {
         }
         else if (_str[i].match(/[()+\-*/]/)) { //  符号もしくは演算子のとき
             if (_str[i] === '-' && (out.length === 0 || out[out.length - 1].kind === "operator")) {
-                out.push({ kind: "operator", value: '_' });
+                out.push({ kind: "operator", value: '_', children: [] });
             }
             else {
-                out.push({ kind: "operator", value: _str[i] });
+                out.push({ kind: "operator", value: _str[i], children: [] });
             }
             ++i;
         }
         else { //  変数もしくは数値のとき
-            var token = { kind: "", value: "" };
+            var token = { kind: "", value: "", children: [] };
             for (; i < _str.length && !_str[i].match(/[()+\-*/]/); ++i) {
                 token.value += _str[i];
             }
@@ -57,12 +58,12 @@ var Lexical = function (_str) {
 /// <reference path="lexical.ts">
 //  Syntax Tree generator class
 var SyntaxTreeGenerator = /** @class */ (function () {
-    function SyntaxTreeGenerator(_tkn, _sseavx, _type) {
+    function SyntaxTreeGenerator(_token, _sseavx, _type) {
         var _this = this;
         this.Expression = function () {
             _this.Term();
             while (_this.idx < _this.token.length && (_this.token[_this.idx].value === '+' || _this.token[_this.idx].value === '-')) {
-                var op = _this.token[_this.idx].value;
+                var op = _this.token[_this.idx];
                 ++_this.idx;
                 _this.Term();
                 _this.Operate(op);
@@ -71,7 +72,7 @@ var SyntaxTreeGenerator = /** @class */ (function () {
         this.Term = function () {
             _this.Factor();
             while (_this.idx < _this.token.length && (_this.token[_this.idx].value === '*' || _this.token[_this.idx].value === '/')) {
-                var op = _this.token[_this.idx].value;
+                var op = _this.token[_this.idx];
                 ++_this.idx;
                 _this.Factor();
                 _this.Operate(op);
@@ -79,7 +80,7 @@ var SyntaxTreeGenerator = /** @class */ (function () {
         };
         this.Factor = function () {
             if (_this.token[_this.idx].kind === "string" || _this.token[_this.idx].kind === "number") {
-                _this.stack.push(_this.token[_this.idx].value);
+                _this.stack.push(_this.token[_this.idx]);
             }
             else if (_this.token[_this.idx].value === '(') {
                 ++_this.idx;
@@ -95,22 +96,11 @@ var SyntaxTreeGenerator = /** @class */ (function () {
         };
         this.Operate = function (_op) {
             var d2 = _this.stack.pop(), d1 = _this.stack.pop();
-            switch (_op) {
-                case '+':
-                    _this.stack.push("_mm" + _this.sseavx + "_add_" + _this.type + "(" + d1 + ", " + d2 + ")");
-                    break;
-                case '-':
-                    _this.stack.push("_mm" + _this.sseavx + "_sub_" + _this.type + "(" + d1 + ", " + d2 + ")");
-                    break;
-                case '*':
-                    _this.stack.push("_mm" + _this.sseavx + "_mul_" + _this.type + "(" + d1 + ", " + d2 + ")");
-                    break;
-                case '/':
-                    _this.stack.push("_mm" + _this.sseavx + "_div_" + _this.type + "(" + d1 + ", " + d2 + ")");
-                    break;
-            }
+            _op.children.push(d1);
+            _op.children.push(d2);
+            _this.stack.push(_op);
         };
-        this.token = _tkn;
+        this.token = _token;
         this.stack = [];
         this.idx = 0;
         this.sseavx = _sseavx;
@@ -119,3 +109,21 @@ var SyntaxTreeGenerator = /** @class */ (function () {
     }
     return SyntaxTreeGenerator;
 }());
+/// <reference path="syntaxtree.ts">
+//  Token[](Syntaxtree) -> string
+var SSEAVX = function (_node) {
+    if (_node.kind === "operator") {
+        switch (_node.value) {
+            case '+': return "_mm256_add_pd(" + SSEAVX(_node.children[0]) + ", " + SSEAVX(_node.children[1]) + ")";
+            case '-': return "_mm256_sub_pd(" + SSEAVX(_node.children[0]) + ", " + SSEAVX(_node.children[1]) + ")";
+            case '*': return "_mm256_mul_pd(" + SSEAVX(_node.children[0]) + ", " + SSEAVX(_node.children[1]) + ")";
+            case '/': return "_mm256_div_pd(" + SSEAVX(_node.children[0]) + ", " + SSEAVX(_node.children[1]) + ")";
+        }
+    }
+    else if (_node.kind === "number") {
+        return "_mm256_set1_pd(" + _node.value + ")";
+    }
+    else {
+        return _node.value;
+    }
+};

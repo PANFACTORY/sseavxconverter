@@ -1,5 +1,6 @@
 /// <reference path="lexical.ts">
 /// <reference path="syntaxtree.ts">
+/// <reference path="sseavx.ts">
 
 //  About HTML
 const $form_sseavx : HTMLFormElement = <HTMLFormElement>document.getElementById('form_sseavx');
@@ -10,7 +11,7 @@ const onChange = (event) : void => {
     let token : Token[] = Lexical($input_equation.value);
     try {
         const generator = new SyntaxTreeGenerator(token, $form_sseavx.elements['radio_sseavx'].value, $form_type.elements['radio_type'].value);
-        $output_equation.value = generator.stack[0];
+        $output_equation.value = SSEAVX(generator.stack[0]);
     } catch (e) {
         alert(e);
     }
