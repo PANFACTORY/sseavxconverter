@@ -81,36 +81,9 @@ const Polish = (_eqn : Token[]) : Token[] => {
     return out;
 }
 
-//  token[](postfix notation) -> token[](postfix notation with FMA)
-const FMA = (_eqn : Token[]) : Token[] => {
-    let out : Token[] = [];
-    for(let i = _eqn.length - 1; i >= 0; --i) {
-        if (_eqn[i].value === '+' || _eqn[i].value === '-') {
-            let j = i - 1;
-            for (; j >= 0 && _eqn[j].value !== '*'; --j);
-            if (j >= 0) {
-                if (_eqn[i].value === '+') {
-                    out.unshift({ kind : "operator", value : '(*+)' });
-                } else {
-                    out.unshift({ kind : "operator", value : '(*-)' }); 
-                }
-                for (let k = i - 1; k > j; --k) {
-                    out.unshift(_eqn[k]);
-                }
-                i = j;
-            } else {
-                out.unshift(_eqn[i]);
-            }
-        } else {
-            out.unshift(_eqn[i]);
-        }
-    }
-    return out;
-}
-
 //  token[] -> string
 const SSEAVX = (_eqn : Token[], _sseavx : string, _type : string) : string => {
-    let d1 : string, d2 : string, d3 : string;
+    let d1 : string, d2 : string;
     const stack : string[] = [];
     for (let i = 0; i < _eqn.length; ++i) {
         if (_eqn[i].kind === "string") {
@@ -123,32 +96,16 @@ const SSEAVX = (_eqn : Token[], _sseavx : string, _type : string) : string => {
                 stack.push(`_mm${_sseavx}_set1_${_type}(${_eqn[i].value})` );
             }
         } else {
-            d3 = stack.pop();
+            d2 = stack.pop();
             if (_eqn[i].value === '_') {
-                stack.push(`_mm${_sseavx}_mul_${_type}(_mm${_sseavx}_set1_${_type}(-1.0), ${d3})`);
+                stack.push(`_mm${_sseavx}_mul_${_type}(_mm${_sseavx}_set1_${_type}(-1.0), ${d2})`);
             } else {
-                d2 = stack.pop();
-                if (_eqn[i].value === '+') {
-                    stack.push(`_mm${_sseavx}_add_${_type}(${d2}, ${d3})`);
-                } else if (_eqn[i].value === '-') {
-                    stack.push(`_mm${_sseavx}_sub_${_type}(${d2}, ${d3})`);
-                } else if (_eqn[i].value === '*') {
-                    stack.push(`_mm${_sseavx}_mul_${_type}(${d2}, ${d3})`);
-                } else if (_eqn[i].value === '/') {
-                    stack.push(`_mm${_sseavx}_div_${_type}(${d2}, ${d3})`);
-                } else {
-                    d1 = stack.pop();
-                    if (_eqn[i].value === "(*+)") {
-                        stack.push(`_mm${_sseavx}_fmadd_${_type}(${d1}, ${d2}, ${d3})`);
-                    } else if (_eqn[i].value === "(*-)") {
-                        stack.push(`_mm${_sseavx}_fmsub_${_type}(${d1}, ${d2}, ${d3})`);
-                    } else if (_eqn[i].value === "(_*+)") {
-                        stack.push(`_mm${_sseavx}_fnmadd_${_type}(${d1}, ${d2}, ${d3})`);
-                    } else if (_eqn[i].value === "(_*-)") {
-                        stack.push(`_mm${_sseavx}_fnmsub_${_type}(${d1}, ${d2}, ${d3})`);
-                    } else {
-                        throw new Error("Error at SSEAVX");
-                    }
+                d1 = stack.pop();
+                switch (_eqn[i].value) {
+                case '+': stack.push(`_mm${_sseavx}_add_${_type}(${d1}, ${d2})`); break;
+                case '-': stack.push(`_mm${_sseavx}_sub_${_type}(${d1}, ${d2})`); break;
+                case '*': stack.push(`_mm${_sseavx}_mul_${_type}(${d1}, ${d2})`); break;
+                case '/': stack.push(`_mm${_sseavx}_div_${_type}(${d1}, ${d2})`); break;
                 }
             }
         }
@@ -166,10 +123,7 @@ const $input_equation : HTMLInputElement = <HTMLInputElement>document.getElement
 const $output_equation : HTMLInputElement = <HTMLInputElement>document.getElementById('output_equation');
 const onChange = (event) : void => {
     try {
-        let postfix : Token[] = Polish(Lexical($input_equation.value));
-        console.log(postfix);
-        console.log(FMA(postfix));
-        $output_equation.value = SSEAVX(postfix, $form_sseavx.elements['radio_sseavx'].value, $form_type.elements['radio_type'].value);
+        $output_equation.value = SSEAVX(Polish(Lexical($input_equation.value)), $form_sseavx.elements['radio_sseavx'].value, $form_type.elements['radio_type'].value);
     } catch (e) {
         alert(e);
     }
