@@ -10,8 +10,8 @@ const $output_equation : HTMLInputElement = <HTMLInputElement>document.getElemen
 const onChange = (event) : void => {
     let token : Token[] = Lexical($input_equation.value);
     try {
-        const generator = new SyntaxTreeGenerator(token, $form_sseavx.elements['radio_sseavx'].value, $form_type.elements['radio_type'].value);
-        $output_equation.value = SSEAVX(generator.stack[0]);
+        let tree : Token =  SyntaxTree(token);
+        $output_equation.value = SSEAVX(tree, $form_sseavx.elements['radio_sseavx'].value, $form_type.elements['radio_type'].value);
     } catch (e) {
         alert(e);
     }
