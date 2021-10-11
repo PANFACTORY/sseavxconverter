@@ -30,113 +30,80 @@ var Lexical = function (_str) {
     }
     return out;
 };
-var Order = function (_ch) {
-    switch (_ch) {
-        case '_': return 4;
-        case '*':
-        case '/': return 3;
-        case '+':
-        case '-': return 2;
-        case '(': return 1;
-    }
-    return -1;
-};
-//  token[](infix notation) -> token[](postfix notation)
-var Polish = function (_eqn) {
-    var out = [];
-    var stack = [];
-    for (var i = 0; i < _eqn.length; ++i) {
-        if (_eqn[i].kind === "string" || _eqn[i].kind === "number") { //  変数または実数のとき
-            out.push(_eqn[i]);
-        }
-        else if (_eqn[i].kind === "operator") { //  演算子のとき
-            if (_eqn[i].value === '(') {
-                stack.push(_eqn[i]);
+//  Syntax Tree generator class
+var SyntaxTreeGenerator = /** @class */ (function () {
+    function SyntaxTreeGenerator(_tkn, _sseavx, _type) {
+        var _this = this;
+        this.Expression = function () {
+            _this.Term();
+            while (_this.idx < _this.token.length && (_this.token[_this.idx].value === '+' || _this.token[_this.idx].value === '-')) {
+                var op = _this.token[_this.idx].value;
+                ++_this.idx;
+                _this.Term();
+                _this.Operate(op);
             }
-            else if (_eqn[i].value === ')') {
-                var wk = stack.pop();
-                while (wk.value !== '(') {
-                    if (!stack.length) {
-                        throw new Error("Error at Polish : '(' is missing.");
-                    }
-                    out.push(wk);
-                    wk = stack.pop();
+        };
+        this.Term = function () {
+            _this.Factor();
+            while (_this.idx < _this.token.length && (_this.token[_this.idx].value === '*' || _this.token[_this.idx].value === '/')) {
+                var op = _this.token[_this.idx].value;
+                ++_this.idx;
+                _this.Factor();
+                _this.Operate(op);
+            }
+        };
+        this.Factor = function () {
+            if (_this.token[_this.idx].kind === "string" || _this.token[_this.idx].kind === "number") {
+                _this.stack.push(_this.token[_this.idx].value);
+            }
+            else if (_this.token[_this.idx].value === '(') {
+                ++_this.idx;
+                _this.Expression();
+                if (_this.token[_this.idx].value !== ')') {
+                    throw new Error("Error in Factor : ')' is missing.");
                 }
             }
             else {
-                while (stack.length && Order(stack[stack.length - 1].value) >= Order(_eqn[i].value)) {
-                    out.push(stack.pop());
-                }
-                stack.push(_eqn[i]);
+                throw new Error("Error in Factor()");
             }
-        }
-        else {
-            throw new Error("Error at Polish : Unexpected token.");
-        }
+            ++_this.idx;
+        };
+        this.Operate = function (_op) {
+            var d2 = _this.stack.pop(), d1 = _this.stack.pop();
+            switch (_op) {
+                case '+':
+                    _this.stack.push("_mm" + _this.sseavx + "_add_" + _this.type + "(" + d1 + ", " + d2 + ")");
+                    break;
+                case '-':
+                    _this.stack.push("_mm" + _this.sseavx + "_sub_" + _this.type + "(" + d1 + ", " + d2 + ")");
+                    break;
+                case '*':
+                    _this.stack.push("_mm" + _this.sseavx + "_mul_" + _this.type + "(" + d1 + ", " + d2 + ")");
+                    break;
+                case '/':
+                    _this.stack.push("_mm" + _this.sseavx + "_div_" + _this.type + "(" + d1 + ", " + d2 + ")");
+                    break;
+            }
+        };
+        this.token = _tkn;
+        this.stack = [];
+        this.idx = 0;
+        this.sseavx = _sseavx;
+        this.type = _type;
+        this.Expression();
     }
-    while (stack.length) {
-        var wk = stack.pop();
-        if (wk.value === '(') {
-            throw new Error("Error '(' is extra.");
-        }
-        out.push(wk);
-    }
-    return out;
-};
-//  token[] -> string
-var SSEAVX = function (_eqn, _sseavx, _type) {
-    var d1, d2;
-    var stack = [];
-    for (var i = 0; i < _eqn.length; ++i) {
-        if (_eqn[i].kind === "string") {
-            stack.push(_eqn[i].value);
-        }
-        else if (_eqn[i].kind === "number") {
-            if (i + 1 < _eqn.length && _eqn[i + 1].value === '_') {
-                stack.push("_mm" + _sseavx + "_set1_" + _type + "(-" + _eqn[i].value + ")");
-                ++i;
-            }
-            else {
-                stack.push("_mm" + _sseavx + "_set1_" + _type + "(" + _eqn[i].value + ")");
-            }
-        }
-        else {
-            d2 = stack.pop();
-            if (_eqn[i].value === '_') {
-                stack.push("_mm" + _sseavx + "_mul_" + _type + "(_mm" + _sseavx + "_set1_" + _type + "(-1.0), " + d2 + ")");
-            }
-            else {
-                d1 = stack.pop();
-                switch (_eqn[i].value) {
-                    case '+':
-                        stack.push("_mm" + _sseavx + "_add_" + _type + "(" + d1 + ", " + d2 + ")");
-                        break;
-                    case '-':
-                        stack.push("_mm" + _sseavx + "_sub_" + _type + "(" + d1 + ", " + d2 + ")");
-                        break;
-                    case '*':
-                        stack.push("_mm" + _sseavx + "_mul_" + _type + "(" + d1 + ", " + d2 + ")");
-                        break;
-                    case '/':
-                        stack.push("_mm" + _sseavx + "_div_" + _type + "(" + d1 + ", " + d2 + ")");
-                        break;
-                }
-            }
-        }
-    }
-    if (stack.length != 1) {
-        throw new Error("Error at SSEAVX");
-    }
-    return stack.pop();
-};
+    return SyntaxTreeGenerator;
+}());
 //  About HTML
 var $form_sseavx = document.getElementById('form_sseavx');
 var $form_type = document.getElementById('form_type');
 var $input_equation = document.getElementById('input_equation');
 var $output_equation = document.getElementById('output_equation');
 var onChange = function (event) {
+    var token = Lexical($input_equation.value);
     try {
-        $output_equation.value = SSEAVX(Polish(Lexical($input_equation.value)), $form_sseavx.elements['radio_sseavx'].value, $form_type.elements['radio_type'].value);
+        var generator = new SyntaxTreeGenerator(token, $form_sseavx.elements['radio_sseavx'].value, $form_type.elements['radio_type'].value);
+        $output_equation.value = generator.stack[0];
     }
     catch (e) {
         alert(e);

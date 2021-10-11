@@ -32,88 +32,67 @@ const Lexical = (_str : string) : Token[] => {
     return out;
 }
 
-const Order = (_ch : string) : number => {
-    switch (_ch) {
-    case '_':           return 4;
-    case '*': case '/': return 3;
-    case '+': case '-': return 2;
-    case '(':           return 1;
-    }
-    return -1;
-}
+//  Syntax Tree generator class
+class SyntaxTreeGenerator {
+    token : Token[];
+    stack : string[];
+    idx;
+    sseavx : string;
+    type : string;
 
-//  token[](infix notation) -> token[](postfix notation)
-const Polish = (_eqn : Token[]) : Token[] => {
-    let out : Token[] = [];
-    const stack : Token[] = [];
-    for(let i = 0; i < _eqn.length; ++i) {
-        if (_eqn[i].kind === "string" || _eqn[i].kind === "number") {   //  変数または実数のとき
-            out.push(_eqn[i]);
-        } else if (_eqn[i].kind === "operator") {                       //  演算子のとき
-            if (_eqn[i].value === '(') {
-                stack.push(_eqn[i]);
-            } else if (_eqn[i].value === ')') {
-                let wk : Token = stack.pop();
-                while(wk.value !== '(') {
-                    if (!stack.length) {
-                        throw new Error("Error at Polish : '(' is missing.");
-                    }
-                    out.push(wk);
-                    wk = stack.pop();
-                }
-            } else {
-                while (stack.length && Order(stack[stack.length - 1].value) >= Order(_eqn[i].value)) {
-                    out.push(stack.pop());
-                }
-                stack.push(_eqn[i]);
+    constructor(_tkn : Token[], _sseavx : string, _type : string) {
+        this.token = _tkn;
+        this.stack = [];
+        this.idx = 0;
+        this.sseavx = _sseavx;
+        this.type = _type;
+        this.Expression();
+    }
+
+    Expression = () => {
+        this.Term();
+        while (this.idx < this.token.length && (this.token[this.idx].value === '+' || this.token[this.idx].value === '-')) {
+            let op : string = this.token[this.idx].value;
+            ++this.idx;
+            this.Term();
+            this.Operate(op);
+        }
+    }
+
+    Term = () => {
+        this.Factor();
+        while (this.idx < this.token.length && (this.token[this.idx].value === '*' || this.token[this.idx].value === '/')) {
+            let op : string = this.token[this.idx].value;
+            ++this.idx;
+            this.Factor();
+            this.Operate(op);
+        }
+    }
+
+    Factor = () => {
+        if (this.token[this.idx].kind === "string" || this.token[this.idx].kind === "number") {
+            this.stack.push(this.token[this.idx].value);
+        } else if (this.token[this.idx].value === '(') {
+            ++this.idx;
+            this.Expression();
+            if (this.token[this.idx].value !==')') {
+                throw new Error("Error in Factor : ')' is missing.")
             }
         } else {
-            throw new Error("Error at Polish : Unexpected token.");
+            throw new Error("Error in Factor()");
         }
+        ++this.idx;
     }
-    while (stack.length) {
-        let wk : Token = stack.pop();
-        if (wk.value === '(') {
-            throw new Error("Error '(' is extra.");
-        }
-        out.push(wk);
-    }
-    return out;
-}
 
-//  token[] -> string
-const SSEAVX = (_eqn : Token[], _sseavx : string, _type : string) : string => {
-    let d1 : string, d2 : string;
-    const stack : string[] = [];
-    for (let i = 0; i < _eqn.length; ++i) {
-        if (_eqn[i].kind === "string") {
-            stack.push(_eqn[i].value);
-        } else if (_eqn[i].kind === "number") {
-            if (i + 1 < _eqn.length && _eqn[i + 1].value === '_') {
-                stack.push(`_mm${_sseavx}_set1_${_type}(-${_eqn[i].value})` );
-                ++i;
-            } else {
-                stack.push(`_mm${_sseavx}_set1_${_type}(${_eqn[i].value})` );
-            }
-        } else {
-            d2 = stack.pop();
-            if (_eqn[i].value === '_') {
-                stack.push(`_mm${_sseavx}_mul_${_type}(_mm${_sseavx}_set1_${_type}(-1.0), ${d2})`);
-            } else {
-                d1 = stack.pop();
-                switch (_eqn[i].value) {
-                case '+': stack.push(`_mm${_sseavx}_add_${_type}(${d1}, ${d2})`); break;
-                case '-': stack.push(`_mm${_sseavx}_sub_${_type}(${d1}, ${d2})`); break;
-                case '*': stack.push(`_mm${_sseavx}_mul_${_type}(${d1}, ${d2})`); break;
-                case '/': stack.push(`_mm${_sseavx}_div_${_type}(${d1}, ${d2})`); break;
-                }
-            }
+    Operate = (_op : string) => {
+        let d2 : string = this.stack.pop(), d1 : string = this.stack.pop();
+        switch (_op) {
+        case '+': this.stack.push(`_mm${this.sseavx}_add_${this.type}(${d1}, ${d2})`); break;
+        case '-': this.stack.push(`_mm${this.sseavx}_sub_${this.type}(${d1}, ${d2})`); break;
+        case '*': this.stack.push(`_mm${this.sseavx}_mul_${this.type}(${d1}, ${d2})`); break;
+        case '/': this.stack.push(`_mm${this.sseavx}_div_${this.type}(${d1}, ${d2})`); break;
         }
     }
-    if (stack.length != 1) {
-        throw new Error("Error at SSEAVX");
-    }
-    return stack.pop();
 }
 
 //  About HTML
@@ -122,8 +101,10 @@ const $form_type : HTMLFormElement = <HTMLFormElement>document.getElementById('f
 const $input_equation : HTMLInputElement = <HTMLInputElement>document.getElementById('input_equation');
 const $output_equation : HTMLInputElement = <HTMLInputElement>document.getElementById('output_equation');
 const onChange = (event) : void => {
+    let token : Token[] = Lexical($input_equation.value);
     try {
-        $output_equation.value = SSEAVX(Polish(Lexical($input_equation.value)), $form_sseavx.elements['radio_sseavx'].value, $form_type.elements['radio_type'].value);
+        const generator = new SyntaxTreeGenerator(token, $form_sseavx.elements['radio_sseavx'].value, $form_type.elements['radio_type'].value);
+        $output_equation.value = generator.stack[0];
     } catch (e) {
         alert(e);
     }
