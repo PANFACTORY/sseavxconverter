@@ -83,6 +83,36 @@ var Polish = function (_eqn) {
     }
     return out;
 };
+//  token[](postfix notation) -> token[](postfix notation with FMA)
+var FMA = function (_eqn) {
+    var out = [];
+    for (var i = _eqn.length - 1; i >= 0; --i) {
+        if (_eqn[i].value === '+' || _eqn[i].value === '-') {
+            var j = i - 1;
+            for (; j >= 0 && _eqn[j].value !== '*'; --j)
+                ;
+            if (j >= 0) {
+                if (_eqn[i].value === '+') {
+                    out.unshift({ kind: "operator", value: '(*+)' });
+                }
+                else {
+                    out.unshift({ kind: "operator", value: '(*-)' });
+                }
+                for (var k = i - 1; k > j; --k) {
+                    out.unshift(_eqn[k]);
+                }
+                i = j;
+            }
+            else {
+                out.unshift(_eqn[i]);
+            }
+        }
+        else {
+            out.unshift(_eqn[i]);
+        }
+    }
+    return out;
+};
 //  token[] -> string
 var SSEAVX = function (_eqn, _sseavx, _type) {
     var d1, d2;
@@ -136,7 +166,10 @@ var $input_equation = document.getElementById('input_equation');
 var $output_equation = document.getElementById('output_equation');
 var onChange = function (event) {
     try {
-        $output_equation.value = SSEAVX(Polish(Lexical($input_equation.value)), $form_sseavx.elements['radio_sseavx'].value, $form_type.elements['radio_type'].value);
+        var postfix = Polish(Lexical($input_equation.value));
+        console.log(postfix);
+        console.log(FMA(postfix));
+        $output_equation.value = SSEAVX(postfix, $form_sseavx.elements['radio_sseavx'].value, $form_type.elements['radio_type'].value);
     }
     catch (e) {
         alert(e);
