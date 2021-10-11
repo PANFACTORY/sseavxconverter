@@ -1,3 +1,27 @@
+/// <reference path="lexical.ts">
+/// <reference path="syntaxtree.ts">
+//  About HTML
+var $form_sseavx = document.getElementById('form_sseavx');
+var $form_type = document.getElementById('form_type');
+var $input_equation = document.getElementById('input_equation');
+var $output_equation = document.getElementById('output_equation');
+var onChange = function (event) {
+    var token = Lexical($input_equation.value);
+    try {
+        var generator = new SyntaxTreeGenerator(token, $form_sseavx.elements['radio_sseavx'].value, $form_type.elements['radio_type'].value);
+        $output_equation.value = generator.stack[0];
+    }
+    catch (e) {
+        alert(e);
+    }
+};
+$form_sseavx.addEventListener('change', onChange);
+$form_type.addEventListener('change', onChange);
+$input_equation.addEventListener('change', onChange);
+var $button_copy = document.getElementById('button_copy');
+$button_copy.addEventListener('click', function (event) {
+    navigator.clipboard.writeText($output_equation.value);
+});
 //  string -> token[]
 var Lexical = function (_str) {
     var out = [];
@@ -30,6 +54,7 @@ var Lexical = function (_str) {
     }
     return out;
 };
+/// <reference path="lexical.ts">
 //  Syntax Tree generator class
 var SyntaxTreeGenerator = /** @class */ (function () {
     function SyntaxTreeGenerator(_tkn, _sseavx, _type) {
@@ -94,25 +119,3 @@ var SyntaxTreeGenerator = /** @class */ (function () {
     }
     return SyntaxTreeGenerator;
 }());
-//  About HTML
-var $form_sseavx = document.getElementById('form_sseavx');
-var $form_type = document.getElementById('form_type');
-var $input_equation = document.getElementById('input_equation');
-var $output_equation = document.getElementById('output_equation');
-var onChange = function (event) {
-    var token = Lexical($input_equation.value);
-    try {
-        var generator = new SyntaxTreeGenerator(token, $form_sseavx.elements['radio_sseavx'].value, $form_type.elements['radio_type'].value);
-        $output_equation.value = generator.stack[0];
-    }
-    catch (e) {
-        alert(e);
-    }
-};
-$form_sseavx.addEventListener('change', onChange);
-$form_type.addEventListener('change', onChange);
-$input_equation.addEventListener('change', onChange);
-var $button_copy = document.getElementById('button_copy');
-$button_copy.addEventListener('click', function (event) {
-    navigator.clipboard.writeText($output_equation.value);
-});
