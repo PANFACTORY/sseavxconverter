@@ -1,30 +1,27 @@
 /// <reference path="lexical.ts">
 
 //  Token(Syntax tree) -> Token(Syntax tree)
-const MoveSign = (_node : Token) => {
-    for (let i = 0; i < _node,length; ++i) {
-        MoveSign(_node.children[i]);
+const RemoveSign = (_node : Token) => {
+    if (_node.value === '_' && _node.children[0].value === '-') {
+        let b2 : Token = _node.children[0].children.pop();
+        let b1 : Token = _node.children[0].children.pop();
+        _node.children.pop();
+        _node.children.push(b2);
+        _node.children.push(b1);
+        _node.value = '-';
     }
     if (_node.value === '-' && _node.children[1].value === '_') {
-        let b1 : Token = _node.children.pop();
-        _node.children[0].push(b1);
-        _node.value = '_';
-        _node.children[0].value = '+';
-    } else if (_node.value === '*' && _node.children[0].value === '_') {
-        let b1 : Token = _node.children.pop();
-        _node.children[0].push(b1);
-        _node.value = '_';
-        _node.children[0].value = '*';
-    } else if (_node.value === '*' && _node.children[1].value === '_') {
-        let b1 : Token = _node.children.shift();
-        _node.children[0].unshift(b1);
-        _node.value = '_';
-        _node.children[0].value = '*';
+        let b1 : Token = _node.children[1].children.pop();
+        _node.children.pop();
+        _node.children.push(b1);
+        _node.value = '+';
+    } else if (_node.value === '-' && _node.children[0].value === '_' && _node.children[1].value === '-') {
+        let b3 : Token = _node.children[1].children.pop();
+        _node.children[1].unshift(b3);
+        let b1 : Token = _node.children[0].children.pop();
+        _node.children.unshift();
+        _node.children.push(b1);
     }
-}
-
-//  Token(Syntax tree) -> Token(Syntax tree)
-const RemoveSign = (_node : Token) => {
     if (_node.value === '+' && _node.children[0].value === '_') {
         let b1 : Token = _node.children[0].children.pop();
         _node.children.shift();
@@ -35,14 +32,26 @@ const RemoveSign = (_node : Token) => {
         _node.children.pop();
         _node.children.push(b1);
         _node.value = '-';
-    } else if (_node.value === '-' && _node.children[1].value === '_') {
-        let b1 : Token = _node.children[1].children.pop();
+    } else if (_node.value === '*' && _node.children[0].value === '_' && _node.children[1].value === '_') {
+        let b1 : Token = _node.children[0].children.pop();
+        let b2 : Token = _node.children[1].children.pop();
+        _node.children.pop();
         _node.children.pop();
         _node.children.push(b1);
-        _node.value = '+';
+        _node.children.push(b2);
     }
     for (let i = 0; i < _node.length; ++i) {
         RemoveSign(_node.children[i]);
+    }
+}
+
+//  Token(Syntax tree) -> Token(Syntax tree)
+const MoveDownSign = (_node : Token) => {
+    if (_node.value === '_' && _node.value === '*') {
+
+    } else if (_node.value === '*')
+    for (let i = 0; i < _node,length; ++i) {
+        MoveDownSign(_node.children[i]);
     }
 }
 
@@ -63,15 +72,9 @@ const ShuffleTree = (_node : Token) => {
             _node.value = _node.children[0].value;
             _node.children[0].value = op;
         } else if (
-            _node.children[1].value === '+' &&
-            _node.children[1].children[0].value === '*' &&
-            _node.children[1].children[1].value === '*' &&
-            _node.children[0].value !== '*'
+            
         ) {
-            let b1 : Token = _node.children.shift();
-            let b2 : Token = _node.children[1].children.shift();
-            _node.children[1].children.unshift(b1);
-            _node.children.unshift(b2);
+            
         }
     }
     for (let i = 0; i < _node.children.length; ++i) {
