@@ -1,5 +1,6 @@
 /// <reference path="lexical.ts">
 /// <reference path="syntaxtree.ts">
+/// <reference path="optimizer.ts">
 /// <reference path="sseavx.ts">
 
 //  About HTML
