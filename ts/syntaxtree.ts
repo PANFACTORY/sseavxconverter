@@ -49,3 +49,58 @@ const Operate = (_op : Token, _stack : Token[]) => {
     _op.children.push(d2);
     _stack.push(_op);
 }
+
+//  Token(Syntax tree) -> Token(Syntax tree)
+const ShuffleTree = (_node : Token) => {
+    if (_node.value === '+' || _node.value === '-') {
+        if (
+            (_node.children[0].value === '+' || _node.children[0].value === '-') && 
+            _node.children[0].children[0].value === '*' && 
+            _node.children[0].children[1].value === '*' && 
+            _node.children[1].value !== '*'
+        ) {
+            let b1 : Token = _node.children[0].children.pop();
+            let b2 : Token = _node.children.pop();
+            _node.children.push(b1);
+            _node.children[0].children.push(b2);
+            let op : string = _node.value;
+            _node.value = _node.children[0].value;
+            _node.children[0].value = op;
+        } else if (
+            _node.children[1].value === '+' &&
+            _node.children[1].children[0].value === '*' &&
+            _node.children[1].children[1].value === '*' &&
+            _node.children[0].value !== '*'
+        ) {
+            let b1 : Token = _node.children.shift();
+            let b2 : Token = _node.children[1].children.shift();
+            _node.children[1].children.unshift(b1);
+            _node.children.unshift(b2);
+        }
+    }
+    for (let i = 0; i < _node.children.length; ++i) {
+        ShuffleTree(_node.children[i]);
+    }
+}
+
+//  Token(Syntax tree) -> Token(Syntax tree)
+const FMA = (_node : Token) => {
+    if (_node.value === '+' || _node.value === '-') {
+        if (_node.children[0].value === '*') {
+            let d2 : Token = _node.children[0].children.pop(), d1 : Token = _node.children[0].children.pop();
+            _node.children.shift();
+            _node.children.unshift(d2);
+            _node.children.unshift(d1);
+            _node.value = `(*${_node.value})`;
+        } else if (_node.children[1].value === '*') {
+            let d2 : Token = _node.children[1].children.pop(), d1 : Token = _node.children[1].children.pop();
+            _node.children.pop();
+            _node.children.unshift(d2);
+            _node.children.unshift(d1);
+            _node.value = `(*${_node.value})`;
+        }
+    }
+    for (let i = 0; i < _node.children.length; ++i) {
+        FMA(_node.children[i]);
+    }
+}

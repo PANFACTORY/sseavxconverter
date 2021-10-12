@@ -4,6 +4,8 @@
 const SSEAVX = (_node : Token, _simd : string, _type : string) : string => {
     if (_node.kind === "operator") {
         switch (_node.value) {
+        case "(*+)": return `_mm${_simd}_fmadd_${_type}(${SSEAVX(_node.children[0], _simd, _type)}, ${SSEAVX(_node.children[1], _simd, _type)}, ${SSEAVX(_node.children[2], _simd, _type)})`;
+        case "(*-)": return `_mm${_simd}_fmsub_${_type}(${SSEAVX(_node.children[0], _simd, _type)}, ${SSEAVX(_node.children[1], _simd, _type)}, ${SSEAVX(_node.children[2], _simd, _type)})`;
         case '+': return `_mm${_simd}_add_${_type}(${SSEAVX(_node.children[0], _simd, _type)}, ${SSEAVX(_node.children[1], _simd, _type)})`;
         case '-': return `_mm${_simd}_sub_${_type}(${SSEAVX(_node.children[0], _simd, _type)}, ${SSEAVX(_node.children[1], _simd, _type)})`;
         case '*': return `_mm${_simd}_mul_${_type}(${SSEAVX(_node.children[0], _simd, _type)}, ${SSEAVX(_node.children[1], _simd, _type)})`;

@@ -11,6 +11,9 @@ const onChange = (event) : void => {
     let token : Token[] = Lexical($input_equation.value);
     try {
         let tree : Token =  SyntaxTree(token);
+        console.log(tree);
+        ShuffleTree(tree);
+        FMA(tree);
         $output_equation.value = SSEAVX(tree, $form_sseavx.elements['radio_sseavx'].value, $form_type.elements['radio_type'].value);
     } catch (e) {
         alert(e);

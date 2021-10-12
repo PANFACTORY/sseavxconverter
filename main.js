@@ -10,6 +10,9 @@ var onChange = function (event) {
     var token = Lexical($input_equation.value);
     try {
         var tree = SyntaxTree(token);
+        console.log(tree);
+        ShuffleTree(tree);
+        FMA(tree);
         $output_equation.value = SSEAVX(tree, $form_sseavx.elements['radio_sseavx'].value, $form_type.elements['radio_type'].value);
     }
     catch (e) {
@@ -103,11 +106,79 @@ var Operate = function (_op, _stack) {
     _op.children.push(d2);
     _stack.push(_op);
 };
+//  Token(Syntax tree) -> Token(Syntax tree)
+var ShuffleTree = function (_node) {
+    if (_node.value === '+' || _node.value === '-') {
+        if ((_node.children[0].value === '+' || _node.children[0].value === '-') &&
+            _node.children[0].children[0].value === '*' &&
+            _node.children[0].children[1].value === '*' &&
+            _node.children[1].value !== '*') {
+            var b1 = _node.children[0].children.pop();
+            var b2 = _node.children.pop();
+            _node.children.push(b1);
+            _node.children[0].children.push(b2);
+            var op = _node.value;
+            _node.value = _node.children[0].value;
+            _node.children[0].value = op;
+        }
+        else if (_node.children[1].value === '+' &&
+            _node.children[1].children[0].value === '*' &&
+            _node.children[1].children[1].value === '*' &&
+            _node.children[0].value !== '*') {
+            var b1 = _node.children.shift();
+            var b2 = _node.children[1].children.shift();
+            _node.children[1].children.unshift(b1);
+            _node.children.unshift(b2);
+        }
+    }
+    for (var i = 0; i < _node.children.length; ++i) {
+        ShuffleTree(_node.children[i]);
+    }
+};
+var Depth = function (_node) {
+    if (_node.children.length === 0) {
+        return 1;
+    }
+    else {
+        var depthmax = 0;
+        for (var i = 0; i < _node.children.length; ++i) {
+            var depthtmp = Depth(_node.children[i]);
+            if (depthmax < depthtmp) {
+                depthmax = depthtmp;
+            }
+        }
+        return 1 + depthmax;
+    }
+};
+//  Token(Syntax tree) -> Token(Syntax tree)
+var FMA = function (_node) {
+    if (_node.value === '+' || _node.value === '-') {
+        if (_node.children[0].value === '*') {
+            var d2 = _node.children[0].children.pop(), d1 = _node.children[0].children.pop();
+            _node.children.shift();
+            _node.children.unshift(d2);
+            _node.children.unshift(d1);
+            _node.value = "(*" + _node.value + ")";
+        }
+        else if (_node.children[1].value === '*') {
+            var d2 = _node.children[1].children.pop(), d1 = _node.children[1].children.pop();
+            _node.children.pop();
+            _node.children.unshift(d2);
+            _node.children.unshift(d1);
+            _node.value = "(*" + _node.value + ")";
+        }
+    }
+    for (var i = 0; i < _node.children.length; ++i) {
+        FMA(_node.children[i]);
+    }
+};
 /// <reference path="syntaxtree.ts">
 //  Token[](Syntaxtree) -> string
 var SSEAVX = function (_node, _simd, _type) {
     if (_node.kind === "operator") {
         switch (_node.value) {
+            case "(*+)": return "_mm" + _simd + "_fmadd_" + _type + "(" + SSEAVX(_node.children[0], _simd, _type) + ", " + SSEAVX(_node.children[1], _simd, _type) + ", " + SSEAVX(_node.children[2], _simd, _type) + ")";
+            case "(*-)": return "_mm" + _simd + "_fmsub_" + _type + "(" + SSEAVX(_node.children[0], _simd, _type) + ", " + SSEAVX(_node.children[1], _simd, _type) + ", " + SSEAVX(_node.children[2], _simd, _type) + ")";
             case '+': return "_mm" + _simd + "_add_" + _type + "(" + SSEAVX(_node.children[0], _simd, _type) + ", " + SSEAVX(_node.children[1], _simd, _type) + ")";
             case '-': return "_mm" + _simd + "_sub_" + _type + "(" + SSEAVX(_node.children[0], _simd, _type) + ", " + SSEAVX(_node.children[1], _simd, _type) + ")";
             case '*': return "_mm" + _simd + "_mul_" + _type + "(" + SSEAVX(_node.children[0], _simd, _type) + ", " + SSEAVX(_node.children[1], _simd, _type) + ")";
