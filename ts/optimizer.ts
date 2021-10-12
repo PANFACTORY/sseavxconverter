@@ -48,34 +48,44 @@ const RemoveSign = (_node : Token) => {
 //  Token(Syntax tree) -> Token(Syntax tree)
 const MoveDownSign = (_node : Token) => {
     if (_node.value === '_' && _node.value === '*') {
-
-    } else if (_node.value === '*')
-    for (let i = 0; i < _node,length; ++i) {
+        let b2 : Token = _node.children[0].children.pop();
+        _node.children.push(b2);
+        _node.value = '*';
+        _node.children[0].value = '_';
+    } else if (_node.value === '*' && _node.children[1].value === '_') {
+        let b2 : Token = _node.children[1].children.pop();
+        let b1 : Token = _node.children.shift();
+        _node.children[0].children.push(b1);
+        _node.children.push(b2);
+    } 
+    for (let i = 0; i < _node.length; ++i) {
         MoveDownSign(_node.children[i]);
     }
 }
 
 //  Token(Syntax tree) -> Token(Syntax tree)
 const ShuffleTree = (_node : Token) => {
-    if (_node.value === '+' || _node.value === '-') {
-        if (
-            (_node.children[0].value === '+' || _node.children[0].value === '-') && 
-            _node.children[0].children[0].value === '*' && 
-            _node.children[0].children[1].value === '*' && 
-            _node.children[1].value !== '*'
-        ) {
-            let b1 : Token = _node.children[0].children.pop();
-            let b2 : Token = _node.children.pop();
-            _node.children.push(b1);
-            _node.children[0].children.push(b2);
-            let op : string = _node.value;
-            _node.value = _node.children[0].value;
-            _node.children[0].value = op;
-        } else if (
-            
-        ) {
-            
-        }
+    if ((_node.value === '+' || _node.value === '-') &&
+        (_node.children[0].value === '+' || _node.children[0].value === '-') && 
+        _node.children[0].children[0].value === '*' && 
+        _node.children[0].children[1].value === '*' && 
+        _node.children[1].value !== '*'
+    ) {
+        let b1 : Token = _node.children[0].children.pop();
+        let b2 : Token = _node.children.pop();
+        _node.children.push(b1);
+        _node.children[0].children.push(b2);
+        let op : string = _node.value;
+        _node.value = _node.children[0].value;
+        _node.children[0].value = op;
+    } else if (
+        _node.value === '+' && 
+        (_node.children[1].value === '+' || _node.children[1].value === '-') && 
+        _node.children[1].children[0].value === '*' && 
+        _node.children[1].children[1].value === '*' && 
+        _node.children[0].value !== '*'
+    ) {
+        
     }
     for (let i = 0; i < _node.children.length; ++i) {
         ShuffleTree(_node.children[i]);

@@ -1,6 +1,7 @@
 /// <reference path="lexical.ts">
 /// <reference path="syntaxtree.ts">
-/// <reference path="sseavx.ts">
+/// <reference path="optimizer.ts">
+// /// <reference path="sseavx.ts">
 //  About HTML
 var $form_sseavx = document.getElementById('form_sseavx');
 var $form_type = document.getElementById('form_type');
@@ -11,8 +12,8 @@ var onChange = function (event) {
     try {
         var tree = SyntaxTree(token);
         console.log(tree);
-        ShuffleTree(tree);
-        FMA(tree);
+        //ShuffleTree(tree);
+        //FMA(tree);
         $output_equation.value = SSEAVX(tree, $form_sseavx.elements['radio_sseavx'].value, $form_type.elements['radio_type'].value);
     }
     catch (e) {
@@ -86,90 +87,39 @@ var Term = function (_token, _idx, _stack) {
 };
 var Factor = function (_token, _idx, _stack) {
     var idx = _idx;
-    if (_token[idx].kind === "string" || _token[idx].kind === "number") {
-        _stack.push(_token[idx]);
-    }
-    else if (_token[idx].value === '(') {
-        idx = Expression(_token, ++idx, _stack);
-        if (_token[idx].value !== ')') {
-            throw new Error("Error in Factor : ')' is missing.");
-        }
+    if (_token[idx].kind === "operator" && _token[idx].value === '_') {
+        var op = _token[idx];
+        idx = Factor(_token, ++idx, _stack);
+        Operate(op, _stack);
+        return idx;
     }
     else {
-        throw new Error("Error in Factor()");
-    }
-    return ++idx;
-};
-var Operate = function (_op, _stack) {
-    var d2 = _stack.pop(), d1 = _stack.pop();
-    _op.children.push(d1);
-    _op.children.push(d2);
-    _stack.push(_op);
-};
-//  Token(Syntax tree) -> Token(Syntax tree)
-var ShuffleTree = function (_node) {
-    if (_node.value === '+' || _node.value === '-') {
-        if ((_node.children[0].value === '+' || _node.children[0].value === '-') &&
-            _node.children[0].children[0].value === '*' &&
-            _node.children[0].children[1].value === '*' &&
-            _node.children[1].value !== '*') {
-            var b1 = _node.children[0].children.pop();
-            var b2 = _node.children.pop();
-            _node.children.push(b1);
-            _node.children[0].children.push(b2);
-            var op = _node.value;
-            _node.value = _node.children[0].value;
-            _node.children[0].value = op;
+        if (_token[idx].kind === "string" || _token[idx].kind === "number") {
+            _stack.push(_token[idx]);
         }
-        else if (_node.children[1].value === '+' &&
-            _node.children[1].children[0].value === '*' &&
-            _node.children[1].children[1].value === '*' &&
-            _node.children[0].value !== '*') {
-            var b1 = _node.children.shift();
-            var b2 = _node.children[1].children.shift();
-            _node.children[1].children.unshift(b1);
-            _node.children.unshift(b2);
-        }
-    }
-    for (var i = 0; i < _node.children.length; ++i) {
-        ShuffleTree(_node.children[i]);
-    }
-};
-var Depth = function (_node) {
-    if (_node.children.length === 0) {
-        return 1;
-    }
-    else {
-        var depthmax = 0;
-        for (var i = 0; i < _node.children.length; ++i) {
-            var depthtmp = Depth(_node.children[i]);
-            if (depthmax < depthtmp) {
-                depthmax = depthtmp;
+        else if (_token[idx].value === '(') {
+            idx = Expression(_token, ++idx, _stack);
+            if (_token[idx].value !== ')') {
+                throw new Error("Error in Factor : ')' is missing.");
             }
         }
-        return 1 + depthmax;
+        else {
+            throw new Error("Error in Factor()");
+        }
+        return ++idx;
     }
 };
-//  Token(Syntax tree) -> Token(Syntax tree)
-var FMA = function (_node) {
-    if (_node.value === '+' || _node.value === '-') {
-        if (_node.children[0].value === '*') {
-            var d2 = _node.children[0].children.pop(), d1 = _node.children[0].children.pop();
-            _node.children.shift();
-            _node.children.unshift(d2);
-            _node.children.unshift(d1);
-            _node.value = "(*" + _node.value + ")";
-        }
-        else if (_node.children[1].value === '*') {
-            var d2 = _node.children[1].children.pop(), d1 = _node.children[1].children.pop();
-            _node.children.pop();
-            _node.children.unshift(d2);
-            _node.children.unshift(d1);
-            _node.value = "(*" + _node.value + ")";
-        }
+var Operate = function (_op, _stack) {
+    if (_op.value === '_') {
+        var b1 = _stack.pop();
+        _op.children.push(b1);
+        _stack.push(_op);
     }
-    for (var i = 0; i < _node.children.length; ++i) {
-        FMA(_node.children[i]);
+    else {
+        var b2 = _stack.pop(), b1 = _stack.pop();
+        _op.children.push(b1);
+        _op.children.push(b2);
+        _stack.push(_op);
     }
 };
 /// <reference path="syntaxtree.ts">
@@ -183,6 +133,7 @@ var SSEAVX = function (_node, _simd, _type) {
             case '-': return "_mm" + _simd + "_sub_" + _type + "(" + SSEAVX(_node.children[0], _simd, _type) + ", " + SSEAVX(_node.children[1], _simd, _type) + ")";
             case '*': return "_mm" + _simd + "_mul_" + _type + "(" + SSEAVX(_node.children[0], _simd, _type) + ", " + SSEAVX(_node.children[1], _simd, _type) + ")";
             case '/': return "_mm" + _simd + "_div_" + _type + "(" + SSEAVX(_node.children[0], _simd, _type) + ", " + SSEAVX(_node.children[1], _simd, _type) + ")";
+            case '_': return "_mm" + _simd + "_mul_" + _type + "(_mm" + _simd + "_set1_" + _type + "(-1.0), " + SSEAVX(_node.children[0], _simd, _type) + ")";
         }
     }
     else if (_node.kind === "number") {
