@@ -51,7 +51,7 @@ const Factor = (_token : Token[], _idx, _stack : Token[]) => {
 }
 
 const Operate = (_op : Token, _stack : Token[]) => {
-    if (_op.value === '_') {
+    if (_op.kind === "operator" && _op.value === '_') {
         let b1 : Token = _stack.pop();
         _op.children.push(b1);
         _stack.push(_op);

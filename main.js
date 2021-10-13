@@ -123,7 +123,7 @@ var Factor = function (_token, _idx, _stack) {
     }
 };
 var Operate = function (_op, _stack) {
-    if (_op.value === '_') {
+    if (_op.kind === "operator" && _op.value === '_') {
         var b1 = _stack.pop();
         _op.children.push(b1);
         _stack.push(_op);
@@ -239,7 +239,7 @@ var MoveUpSign = function (_node) {
 };
 //  Token(Syntax tree) -> Token(Syntax tree)
 var RemoveSign = function (_node) {
-    if (_node.value === '_' && _node.children[0].kind === "operator" && _node.children[0].value === '-') {
+    if (_node.kind === "operator" && _node.value === '_' && _node.children[0].value === '-') {
         var b2 = _node.children[0].children.pop();
         var b1 = _node.children[0].children.pop();
         _node.children.pop();
@@ -302,7 +302,7 @@ var ShuffleTree = function (_node) {
 };
 //  Token(Syntax tree) -> Token(Syntax tree)
 var ReplaceFMA = function (_node) {
-    if (_node.value === '_' && (_node.children[0].value === '+' || _node.children[0].value === '-')) {
+    if (_node.kind === "operator" && _node.value === '_' && (_node.children[0].value === '+' || _node.children[0].value === '-')) {
         if (_node.children[0].children[0].value === '*') {
             var op = _node.children[0].value;
             var b3 = _node.children[0].children.pop();

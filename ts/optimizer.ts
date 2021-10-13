@@ -91,7 +91,7 @@ const MoveUpSign = (_node : Token) => {
 
 //  Token(Syntax tree) -> Token(Syntax tree)
 const RemoveSign = (_node : Token) => {
-    if (_node.value === '_' && _node.children[0].kind === "operator" && _node.children[0].value === '-') {
+    if (_node.kind === "operator" && _node.value === '_' && _node.children[0].value === '-') {
         let b2 : Token = _node.children[0].children.pop();
         let b1 : Token = _node.children[0].children.pop();
         _node.children.pop();
@@ -162,7 +162,7 @@ const ShuffleTree = (_node : Token) => {
 
 //  Token(Syntax tree) -> Token(Syntax tree)
 const ReplaceFMA = (_node : Token) => {
-    if (_node.value === '_' && (_node.children[0].value === '+' || _node.children[0].value === '-')) {
+    if (_node.kind === "operator" && _node.value === '_' && (_node.children[0].value === '+' || _node.children[0].value === '-')) {
         if (_node.children[0].children[0].value === '*') {
             let op : string = _node.children[0].value;
             let b3 : Token = _node.children[0].children.pop();
