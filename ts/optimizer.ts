@@ -173,7 +173,7 @@ const ReplaceFMA = (_node : Token) => {
             _node.children.push(b1);
             _node.children.push(b2);
             _node.children.push(b3);
-            _node.children[0].value === '+' ? "(_*-)" : "(_*+)";
+            _node.value = op === '+' ? "(_*-)" : "(_*+)";
         } else if (_node.children[0].children[1].value === '*') {
             let op : string = _node.children[0].value;
             let b3 : Token = _node.children[0].children[1].children.pop();

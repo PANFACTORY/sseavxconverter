@@ -312,7 +312,7 @@ var ReplaceFMA = function (_node) {
             _node.children.push(b1);
             _node.children.push(b2);
             _node.children.push(b3);
-            _node.children[0].value === '+' ? "(_*-)" : "(_*+)";
+            _node.value = op === '+' ? "(_*-)" : "(_*+)";
         }
         else if (_node.children[0].children[1].value === '*') {
             var op = _node.children[0].value;
