@@ -30,6 +30,11 @@ $form_fma.addEventListener('change', onChange);
 $form_type.addEventListener('change', onChange);
 $input_equation.addEventListener('change', onChange);
 
+const $button_delete : HTMLButtonElement = <HTMLButtonElement>document.getElementById('button_delete');
+$button_delete.addEventListener('click', (event) : void => {
+    $input_equation.value = "";
+});
+
 const $button_copy : HTMLButtonElement = <HTMLButtonElement>document.getElementById('button_copy');
 $button_copy.addEventListener('click', (event) : void => {
     navigator.clipboard.writeText($output_equation.value);

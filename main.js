@@ -33,6 +33,10 @@ var $button_copy = document.getElementById('button_copy');
 $button_copy.addEventListener('click', function (event) {
     navigator.clipboard.writeText($output_equation.value);
 });
+var $button_delete = document.getElementById('button_delete');
+$button_delete.addEventListener('click', function (event) {
+    $input_equation.value = "";
+});
 //  string -> token[]
 var Lexical = function (_str) {
     var out = [];
