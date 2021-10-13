@@ -9,33 +9,35 @@ var $form_type = document.getElementById('form_type');
 var $input_equation = document.getElementById('input_equation');
 var $output_equation = document.getElementById('output_equation');
 var onChange = function (event) {
-    var token = Lexical($input_equation.value);
-    try {
-        var tree = SyntaxTree(token);
-        if ($form_fma.elements['radio_fma'].value === 'yes') {
-            MoveUpSign(tree);
-            RemoveSign(tree);
-            ShuffleTree(tree);
-            ReplaceFMA(tree);
+    if ($input_equation.value) {
+        var token = Lexical($input_equation.value);
+        try {
+            var tree = SyntaxTree(token);
+            if ($form_fma.elements['radio_fma'].value === 'yes') {
+                MoveUpSign(tree);
+                RemoveSign(tree);
+                ShuffleTree(tree);
+                ReplaceFMA(tree);
+            }
+            console.log(tree);
+            $output_equation.value = SSEAVX(tree, $form_sseavx.elements['radio_sseavx'].value, $form_type.elements['radio_type'].value);
         }
-        console.log(tree);
-        $output_equation.value = SSEAVX(tree, $form_sseavx.elements['radio_sseavx'].value, $form_type.elements['radio_type'].value);
-    }
-    catch (e) {
-        alert(e);
+        catch (e) {
+            alert(e);
+        }
     }
 };
 $form_sseavx.addEventListener('change', onChange);
 $form_fma.addEventListener('change', onChange);
 $form_type.addEventListener('change', onChange);
 $input_equation.addEventListener('change', onChange);
-var $button_copy = document.getElementById('button_copy');
-$button_copy.addEventListener('click', function (event) {
-    navigator.clipboard.writeText($output_equation.value);
-});
 var $button_delete = document.getElementById('button_delete');
 $button_delete.addEventListener('click', function (event) {
     $input_equation.value = "";
+});
+var $button_copy = document.getElementById('button_copy');
+$button_copy.addEventListener('click', function (event) {
+    navigator.clipboard.writeText($output_equation.value);
 });
 //  string -> token[]
 var Lexical = function (_str) {

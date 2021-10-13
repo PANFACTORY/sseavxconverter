@@ -10,19 +10,21 @@ const $form_type : HTMLFormElement = <HTMLFormElement>document.getElementById('f
 const $input_equation : HTMLInputElement = <HTMLInputElement>document.getElementById('input_equation');
 const $output_equation : HTMLInputElement = <HTMLInputElement>document.getElementById('output_equation');
 const onChange = (event) : void => {
-    let token : Token[] = Lexical($input_equation.value);
-    try {
-        let tree : Token =  SyntaxTree(token);
-        if ($form_fma.elements['radio_fma'].value === 'yes') {
-            MoveUpSign(tree);
-            RemoveSign(tree);
-            ShuffleTree(tree);
-            ReplaceFMA(tree);
+    if ($input_equation.value) {
+        let token : Token[] = Lexical($input_equation.value);
+        try {
+            let tree : Token =  SyntaxTree(token);
+            if ($form_fma.elements['radio_fma'].value === 'yes') {
+                MoveUpSign(tree);
+                RemoveSign(tree);
+                ShuffleTree(tree);
+                ReplaceFMA(tree);
+            }
+            console.log(tree);
+            $output_equation.value = SSEAVX(tree, $form_sseavx.elements['radio_sseavx'].value, $form_type.elements['radio_type'].value);
+        } catch (e) {
+            alert(e);
         }
-        console.log(tree);
-        $output_equation.value = SSEAVX(tree, $form_sseavx.elements['radio_sseavx'].value, $form_type.elements['radio_type'].value);
-    } catch (e) {
-        alert(e);
     }
 }
 $form_sseavx.addEventListener('change', onChange);
