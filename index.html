@@ -13,7 +13,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col">
-                <div class="card border-secondary my-4 ml-4 mr-2 p-2">
+                <div class="card border-secondary m-4 p-2">
                     <div class="card-body">
                         <h5 class="card-title">SSE/AVX/AVX2/AVX512</h5>
                     </div>
@@ -36,7 +36,26 @@
             </div>
 
             <div class="col">
-                <div class="card border-secondary my-4 ml-2 mr-4 p-2">
+                <div class="card border-secondary my-4 p-2">
+                    <div class="card-body">
+                        <h5 class="card-title">FMA</h5>
+                    </div>
+                    <p class="card-text">Apply Fused Multiply and Add.</p>
+                    <form class="form-inline" id="form_fma">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="radio_fma" id="radio_fma_yes" value='yes'>
+                            <label class="form-check-label" for="radio_fma_yes">Yes</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="radio_fma" id="radio_fma_no" value='no' checked>
+                            <label class="form-check-label" for="radio_fma_no">No</label>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="card border-secondary m-4 p-2">
                     <div class="card-body">
                         <h5 class="card-title">Data type</h5>
                     </div>

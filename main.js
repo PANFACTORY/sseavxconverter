@@ -4,6 +4,7 @@
 /// <reference path="sseavx.ts">
 //  About HTML
 var $form_sseavx = document.getElementById('form_sseavx');
+var $form_fma = document.getElementById('form_fma');
 var $form_type = document.getElementById('form_type');
 var $input_equation = document.getElementById('input_equation');
 var $output_equation = document.getElementById('output_equation');
@@ -11,10 +12,12 @@ var onChange = function (event) {
     var token = Lexical($input_equation.value);
     try {
         var tree = SyntaxTree(token);
-        MoveUpSign(tree);
-        RemoveSign(tree);
-        ShuffleTree(tree);
-        ReplaceFMA(tree);
+        if ($form_fma.elements['radio_fma'].value === 'yes') {
+            MoveUpSign(tree);
+            RemoveSign(tree);
+            ShuffleTree(tree);
+            ReplaceFMA(tree);
+        }
         console.log(tree);
         $output_equation.value = SSEAVX(tree, $form_sseavx.elements['radio_sseavx'].value, $form_type.elements['radio_type'].value);
     }
@@ -23,6 +26,7 @@ var onChange = function (event) {
     }
 };
 $form_sseavx.addEventListener('change', onChange);
+$form_fma.addEventListener('change', onChange);
 $form_type.addEventListener('change', onChange);
 $input_equation.addEventListener('change', onChange);
 var $button_copy = document.getElementById('button_copy');
