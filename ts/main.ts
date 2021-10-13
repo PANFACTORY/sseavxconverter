@@ -1,7 +1,7 @@
 /// <reference path="lexical.ts">
 /// <reference path="syntaxtree.ts">
 /// <reference path="optimizer.ts">
-// /// <reference path="sseavx.ts">
+/// <reference path="sseavx.ts">
 
 //  About HTML
 const $form_sseavx : HTMLFormElement = <HTMLFormElement>document.getElementById('form_sseavx');
@@ -12,6 +12,8 @@ const onChange = (event) : void => {
     let token : Token[] = Lexical($input_equation.value);
     try {
         let tree : Token =  SyntaxTree(token);
+        MoveUpSign(tree);
+        //RemoveSign(tree);
         console.log(tree);
         //ShuffleTree(tree);
         //FMA(tree);
