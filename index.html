@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    <link href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" rel="stylesheet">
     <title>SSE/AVX converter</title>
 </head>
 <body>
@@ -81,7 +82,16 @@
                         <h5 class="card-title">Original equation</h5>
                     </div>
                     <p class="card-text">Input your equation with infix notation.</p>
-                    <input type="text" class="card-text" id="input_equation" />
+                    <div class="input-group mb-2">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">
+                                <button type="button" class="btn btn-outline-primary" id="button_delete">
+                                    <i id="icon_delete" class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <input type="text" class="card-text form-control" id="input_equation" />
+                    </div>
                 </div>
             </div>
         </div>
@@ -92,8 +102,16 @@
                     <div class="card-body">
                         <h5 class="card-title">SSE/AVX intrinsic</h5>
                     </div>
-                    <textarea id="output_equation" class="card-text form-control" readonly></textarea>
-                    <button type="button" class="btn btn-outline-primary mt-2" id="button_copy">Copy</button>
+                    <div class="input-group mb-2">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">
+                                <button type="button" class="btn btn-outline-primary" id="button_copy">
+                                    <i id="icon_copy" class="fas fa-file-export"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <textarea id="output_equation" class="card-text form-control" readonly></textarea>
+                    </div>                    
                 </div>
             </div>
         </div>
