@@ -34,6 +34,7 @@ $input_equation.addEventListener('change', onChange);
 var $button_delete = document.getElementById('button_delete');
 $button_delete.addEventListener('click', function (event) {
     $input_equation.value = "";
+    $output_equation.value = "";
 });
 var $button_copy = document.getElementById('button_copy');
 $button_copy.addEventListener('click', function (event) {

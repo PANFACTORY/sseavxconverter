@@ -35,6 +35,7 @@ $input_equation.addEventListener('change', onChange);
 const $button_delete : HTMLButtonElement = <HTMLButtonElement>document.getElementById('button_delete');
 $button_delete.addEventListener('click', (event) : void => {
     $input_equation.value = "";
+    $output_equation.value = "";
 });
 
 const $button_copy : HTMLButtonElement = <HTMLButtonElement>document.getElementById('button_copy');
