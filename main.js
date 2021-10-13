@@ -11,11 +11,11 @@ var onChange = function (event) {
     var token = Lexical($input_equation.value);
     try {
         var tree = SyntaxTree(token);
-        MoveSign(tree);
-        //RemoveSign(tree);
+        MoveUpSign(tree);
+        RemoveSign(tree);
+        ShuffleTree(tree);
+        ReplaceFMA(tree);
         console.log(tree);
-        //ShuffleTree(tree);
-        //FMA(tree);
         $output_equation.value = SSEAVX(tree, $form_sseavx.elements['radio_sseavx'].value, $form_type.elements['radio_type'].value);
     }
     catch (e) {
@@ -129,6 +129,8 @@ var Operate = function (_op, _stack) {
 var SSEAVX = function (_node, _simd, _type) {
     if (_node.kind === "operator") {
         switch (_node.value) {
+            case "(_*+)": return "_mm" + _simd + "_fnmadd_" + _type + "(" + SSEAVX(_node.children[0], _simd, _type) + ", " + SSEAVX(_node.children[1], _simd, _type) + ", " + SSEAVX(_node.children[2], _simd, _type) + ")";
+            case "(_*-)": return "_mm" + _simd + "_fnmsub_" + _type + "(" + SSEAVX(_node.children[0], _simd, _type) + ", " + SSEAVX(_node.children[1], _simd, _type) + ", " + SSEAVX(_node.children[2], _simd, _type) + ")";
             case "(*+)": return "_mm" + _simd + "_fmadd_" + _type + "(" + SSEAVX(_node.children[0], _simd, _type) + ", " + SSEAVX(_node.children[1], _simd, _type) + ", " + SSEAVX(_node.children[2], _simd, _type) + ")";
             case "(*-)": return "_mm" + _simd + "_fmsub_" + _type + "(" + SSEAVX(_node.children[0], _simd, _type) + ", " + SSEAVX(_node.children[1], _simd, _type) + ", " + SSEAVX(_node.children[2], _simd, _type) + ")";
             case '+': return "_mm" + _simd + "_add_" + _type + "(" + SSEAVX(_node.children[0], _simd, _type) + ", " + SSEAVX(_node.children[1], _simd, _type) + ")";
@@ -147,9 +149,9 @@ var SSEAVX = function (_node, _simd, _type) {
 };
 /// <reference path="lexical.ts">
 //  Token(Syntax tree) -> Token(Syntax tree)
-var MoveSign = function (_node) {
+var MoveUpSign = function (_node) {
     for (var i = 0; i < _node.children.length; ++i) {
-        MoveSign(_node.children[i]);
+        MoveUpSign(_node.children[i]);
     }
     if ((_node.value === '*' || _node.value === '/') &&
         _node.children[0].kind === "operator" && _node.children[0].value === '_' &&
@@ -226,9 +228,6 @@ var MoveSign = function (_node) {
 };
 //  Token(Syntax tree) -> Token(Syntax tree)
 var RemoveSign = function (_node) {
-    for (var i = 0; i < _node.children.length; ++i) {
-        RemoveSign(_node.children[i]);
-    }
     if (_node.value === '_' && _node.children[0].kind === "operator" && _node.children[0].value === '-') {
         var b2 = _node.children[0].children.pop();
         var b1 = _node.children[0].children.pop();
@@ -237,126 +236,104 @@ var RemoveSign = function (_node) {
         _node.children.push(b1);
         _node.value = '-';
     }
-    else if (_node.value === '+' && _node.children[0].kind === "operator" && _node.children[0].value === '_') {
-        var b1 = _node.children[0].children.pop();
-        _node.children.shift();
-        _node.children.push(b1);
-        _node.value = '-';
-    }
-    else if (_node.value === '+' && _node.children[1].kind === "operator" && _node.children[1].value === '_') {
-        var b2 = _node.children[1].children.pop();
-        _node.children.pop();
-        _node.children.push(b2);
-        _node.value = '-';
-    }
-    else if (_node.value === '-' &&
-        _node.children[0].kind === "operator" && _node.children[0].value === '_' &&
-        _node.children[1].kind === "operator" && _node.children[1].value === '_') {
-        var b1 = _node.children[0].children.pop();
-        var b2 = _node.children[1].children.pop();
-        _node.children.pop();
-        _node.children.pop();
-        _node.children.push(b2);
-        _node.children.push(b1);
-    }
-    else if (_node.value === '-' &&
-        _node.children[1].kind === "operator" && _node.children[1].value === '_') {
-        var b2 = _node.children[1].children.pop();
-        _node.children.pop();
-        _node.children.push(b2);
-        _node.value = '+';
+    for (var i = 0; i < _node.children.length; ++i) {
+        RemoveSign(_node.children[i]);
     }
 };
-/*
 //  Token(Syntax tree) -> Token(Syntax tree)
-const MoveDownSign = (_node : Token) => {
-    if (_node.value === '_' && _node.value === '*') {
-        let b2 : Token = _node.children[0].children.pop();
-        _node.children.push(b2);
-        _node.value = '*';
-        _node.children[0].value = '_';
-    } else if (_node.value === '*' && _node.children[1].value === '_') {
-        let b2 : Token = _node.children[1].children.pop();
-        let b1 : Token = _node.children.shift();
-        _node.children[0].children.push(b1);
-        _node.children.push(b2);
+var ShuffleTree = function (_node) {
+    if (_node.value === '+' &&
+        (_node.children[1].value === '+' || _node.children[1].value === '-') &&
+        _node.children[1].children[0].value === '*' &&
+        _node.children[1].children[1].value === '*' &&
+        _node.children[0].value !== '*') {
+        var b2 = _node.children.pop();
+        _node.children.unshift(b2);
     }
-    for (let i = 0; i < _node.length; ++i) {
-        MoveDownSign(_node.children[i]);
-    }
-}
-
-//  Token(Syntax tree) -> Token(Syntax tree)
-const ShuffleTree = (_node : Token) => {
     if ((_node.value === '+' || _node.value === '-') &&
         (_node.children[0].value === '+' || _node.children[0].value === '-') &&
         _node.children[0].children[0].value === '*' &&
         _node.children[0].children[1].value === '*' &&
-        _node.children[1].value !== '*'
-    ) {
-        let b1 : Token = _node.children[0].children.pop();
-        let b2 : Token = _node.children.pop();
-        _node.children.push(b1);
-        _node.children[0].children.push(b2);
-        let op : string = _node.value;
+        _node.children[1].value !== '*') {
+        var b2 = _node.children[0].children.pop();
+        var b3 = _node.children.pop();
+        _node.children.push(b2);
+        _node.children[0].children.push(b3);
+        var op = _node.value;
         _node.value = _node.children[0].value;
         _node.children[0].value = op;
-    } else if (
-        _node.value === '+' &&
-        (_node.children[1].value === '+' || _node.children[1].value === '-') &&
+    }
+    else if (_node.value === '-' &&
+        _node.children[1].value === '+' &&
         _node.children[1].children[0].value === '*' &&
         _node.children[1].children[1].value === '*' &&
-        _node.children[0].value !== '*'
-    ) {
-        
+        _node.children[0].value !== '*') {
+        var b1 = _node.children.shift();
+        var b3 = _node.children[0].children.pop();
+        _node.children[0].children.unshift(b1);
+        _node.children.push(b3);
+        _node.children[0].value = '-';
     }
-    for (let i = 0; i < _node.children.length; ++i) {
+    else if (_node.value === '-' &&
+        _node.children[1].value === '-' &&
+        _node.children[1].children[0].value === '*' &&
+        _node.children[1].children[1].value === '*' &&
+        _node.children[0].value !== '*') {
+        var b1 = _node.children.shift();
+        var b3 = _node.children[0].children.pop();
+        _node.children[0].children.unshift(b1);
+        _node.children.unshift(b3);
+        _node.value = '+';
+    }
+    for (var i = 0; i < _node.children.length; ++i) {
         ShuffleTree(_node.children[i]);
     }
-}
-
+};
 //  Token(Syntax tree) -> Token(Syntax tree)
-const ReplaceFMA = (_node : Token) => {
+var ReplaceFMA = function (_node) {
     if (_node.value === '_' && (_node.children[0].value === '+' || _node.children[0].value === '-')) {
         if (_node.children[0].children[0].value === '*') {
-            let op : string = _node.children[0].value;
-            let b3 : Token = _node.children[0].children.pop();
-            let b2 : Token = _node.children[0].children[0].pop();
-            let b1 : Token = _node.children[0].children[0].pop();
+            var op = _node.children[0].value;
+            var b3 = _node.children[0].children.pop();
+            var b2 = _node.children[0].children[0].children.pop();
+            var b1 = _node.children[0].children[0].children.pop();
             _node.children[0].children.pop();
             _node.children.pop();
             _node.children.push(b1);
             _node.children.push(b2);
             _node.children.push(b3);
-            _node.value = `(_*${op})`;
-        } else if (_node.children[0].children[1].value === '*') {
-            let op : string = _node.children[0].value;
-            let b3 : Token = _node.children[0].chilren[1].pop();
-            let b2 : Token = _node.children[0].chilren[1].pop();
+            _node.children[0].value === '+' ? "(_*-)" : "(_*+)";
+        }
+        else if (_node.children[0].children[1].value === '*') {
+            var op = _node.children[0].value;
+            var b3 = _node.children[0].children[1].children.pop();
+            var b2 = _node.children[0].children[1].children.pop();
             _node.children[0].children.pop();
-            let b1 : Token = _node.children[0].children.pop();
+            var b1 = _node.children[0].children.pop();
             _node.children.pop();
-            _node.push(b2);
-            _node.push(b3);
-            _node.push(b1);
+            _node.children.push(b2);
+            _node.children.push(b3);
+            _node.children.push(b1);
             _node.value = op === '+' ? "(_*-)" : "(*-)";
         }
-    } else if (_node.value === '+' || _node.value === '-') {
+    }
+    else if (_node.value === '+' || _node.value === '-') {
         if (_node.children[0].value === '*') {
-            let b2 : Token = _node.children[0].children.pop(), b1 : Token = _node.children[0].children.pop();
+            var b2 = _node.children[0].children.pop(), b1 = _node.children[0].children.pop();
             _node.children.shift();
             _node.children.unshift(b2);
             _node.children.unshift(b1);
-            _node.value = `(*${_node.value})`;
-        } else if (_node.children[1].value === '*') {
-            let b2 : Token = _node.children[1].children.pop(), b1 : Token = _node.children[1].children.pop();
+            _node.value = "(*" + _node.value + ")";
+        }
+        else if (_node.children[1].value === '*') {
+            var b2 = _node.children[1].children.pop(), b1 = _node.children[1].children.pop();
             _node.children.pop();
             _node.children.unshift(b2);
             _node.children.unshift(b1);
-            _node.value = _node.value === '+' ? "(*+)" : "(_*-)";
+            _node.value = _node.value === '+' ? "(*+)" : "(_*+)";
         }
     }
-    for (let i = 0; i < _node.children.length; ++i) {
+    for (var i = 0; i < _node.children.length; ++i) {
         ReplaceFMA(_node.children[i]);
     }
-}*/ 
+};

@@ -13,10 +13,10 @@ const onChange = (event) : void => {
     try {
         let tree : Token =  SyntaxTree(token);
         MoveUpSign(tree);
-        //RemoveSign(tree);
+        RemoveSign(tree);
+        ShuffleTree(tree);
+        ReplaceFMA(tree);
         console.log(tree);
-        //ShuffleTree(tree);
-        //FMA(tree);
         $output_equation.value = SSEAVX(tree, $form_sseavx.elements['radio_sseavx'].value, $form_type.elements['radio_type'].value);
     } catch (e) {
         alert(e);
