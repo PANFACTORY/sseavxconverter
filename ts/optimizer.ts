@@ -1,6 +1,16 @@
 /// <reference path="lexical.ts">
 
 //  Token(Syntax tree) -> Token(Syntax tree)
+const ExchangeEqual = (_node : Token) => {
+    if (_node.value.match(/[+\-*/]=/)) {
+        let b1 : Token = _node.children[0];
+        let b2 : Token = _node.children.pop();
+        _node.children.push({ kind : "operator", value : _node.value[0], children : [ b1, b2 ] });
+        _node.value = '=';
+    }
+}
+
+//  Token(Syntax tree) -> Token(Syntax tree)
 const MoveUpSign = (_node : Token) => {
     for (let i = 0; i < _node.children.length; ++i) {
         MoveUpSign(_node.children[i]);

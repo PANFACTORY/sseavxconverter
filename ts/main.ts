@@ -15,6 +15,7 @@ const onChange = (event) : void => {
         try {
             let tree : Token =  SyntaxTree(token);
             if ($form_fma.elements['radio_fma'].value === 'yes') {
+                ExchangeEqual(tree);
                 MoveUpSign(tree);
                 RemoveSign(tree);
                 ShuffleTree(tree);

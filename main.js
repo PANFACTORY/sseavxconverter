@@ -14,6 +14,7 @@ var onChange = function (event) {
         try {
             var tree = SyntaxTree(token);
             if ($form_fma.elements['radio_fma'].value === 'yes') {
+                ExchangeEqual(tree);
                 MoveUpSign(tree);
                 RemoveSign(tree);
                 ShuffleTree(tree);
@@ -184,6 +185,15 @@ var SSEAVX = function (_node, _simd, _type) {
     }
 };
 /// <reference path="lexical.ts">
+//  Token(Syntax tree) -> Token(Syntax tree)
+var ExchangeEqual = function (_node) {
+    if (_node.value.match(/[+\-*/]=/)) {
+        var b1 = _node.children[0];
+        var b2 = _node.children.pop();
+        _node.children.push({ kind: "operator", value: _node.value[0], children: [b1, b2] });
+        _node.value = '=';
+    }
+};
 //  Token(Syntax tree) -> Token(Syntax tree)
 var MoveUpSign = function (_node) {
     for (var i = 0; i < _node.children.length; ++i) {
