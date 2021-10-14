@@ -47,8 +47,12 @@ var Lexical = function (_str) {
         if (!_str[i]) { //  空白なら読み飛ばす
             ++i;
         }
-        else if (_str[i].match(/[()+\-*/]/)) { //  符号もしくは演算子のとき
-            if (_str[i] === '-' && (out.length === 0 || out[out.length - 1].kind === "operator")) {
+        else if (_str[i].match(/[=()+\-*/]/)) { //  符号もしくは演算子のとき
+            if (_str[i].match(/[+\-*/]/) && i + 1 < _str.length && _str[i + 1] === '=') {
+                out.push({ kind: "operator", value: _str[i] + _str[i + 1], children: [] });
+                ++i;
+            }
+            else if (_str[i] === '-' && (out.length === 0 || out[out.length - 1].kind === "operator")) {
                 out.push({ kind: "operator", value: '_', children: [] });
             }
             else {
@@ -58,7 +62,7 @@ var Lexical = function (_str) {
         }
         else { //  変数もしくは数値のとき
             var token = { kind: "", value: "", children: [] };
-            for (; i < _str.length && !_str[i].match(/[()+\-*/]/); ++i) {
+            for (; i < _str.length && !_str[i].match(/[=()+\-*/]/); ++i) {
                 token.value += _str[i];
             }
             if (token.value.match(/^\d+(?:\.\d+)?/)) {
@@ -70,6 +74,7 @@ var Lexical = function (_str) {
             out.push(token);
         }
     }
+    console.log(out);
     return out;
 };
 /// <reference path="lexical.ts">
