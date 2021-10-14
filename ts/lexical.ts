@@ -22,7 +22,7 @@ const Lexical = (_str : string) : Token[] => {
             for (; i < _str.length && !_str[i].match(/[()+\-*/]/); ++i) {
                 token.value += _str[i];
             }
-            if (token.value.match(/\d+(?:\.\d+)?/)) {
+            if (token.value.match(/^\d+(?:\.\d+)?/)) {
                 token.kind = "number";
             } else {
                 token.kind = "string";

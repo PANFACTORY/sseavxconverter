@@ -61,7 +61,7 @@ var Lexical = function (_str) {
             for (; i < _str.length && !_str[i].match(/[()+\-*/]/); ++i) {
                 token.value += _str[i];
             }
-            if (token.value.match(/\d+(?:\.\d+)?/)) {
+            if (token.value.match(/^\d+(?:\.\d+)?/)) {
                 token.kind = "number";
             }
             else {
