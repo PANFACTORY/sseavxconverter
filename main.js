@@ -74,18 +74,13 @@ var Lexical = function (_str) {
             out.push(token);
         }
     }
-    console.log(out);
     return out;
 };
 /// <reference path="lexical.ts">
 //  Token[] -> Token(Syntax tree)
 var SyntaxTree = function (_token) {
     var stack = [];
-    if (_token.length > 2 && (_token[1].value === '=' ||
-        _token[1].value === '+=' ||
-        _token[1].value === '-=' ||
-        _token[1].value === '*=' ||
-        _token[1].value === '/=')) {
+    if (_token.length > 2 && _token[1].value.match(/[+\-*/]?=/)) {
         stack.push(_token[0]);
         Expression(_token, 2, stack);
         Operate(_token[1], stack);
@@ -165,6 +160,11 @@ var Operate = function (_op, _stack) {
 var SSEAVX = function (_node, _simd, _type) {
     if (_node.kind === "operator") {
         switch (_node.value) {
+            case '=': return SSEAVX(_node.children[0], _simd, _type) + "=" + SSEAVX(_node.children[1], _simd, _type);
+            case '+=': return SSEAVX(_node.children[0], _simd, _type) + "=_mm" + _simd + "_add_" + _type + "(" + SSEAVX(_node.children[0], _simd, _type) + ", " + SSEAVX(_node.children[1], _simd, _type) + ")";
+            case '-=': return SSEAVX(_node.children[0], _simd, _type) + "=_mm" + _simd + "_sub_" + _type + "(" + SSEAVX(_node.children[0], _simd, _type) + ", " + SSEAVX(_node.children[1], _simd, _type) + ")";
+            case '*=': return SSEAVX(_node.children[0], _simd, _type) + "=_mm" + _simd + "_mul_" + _type + "(" + SSEAVX(_node.children[0], _simd, _type) + ", " + SSEAVX(_node.children[1], _simd, _type) + ")";
+            case '/=': return SSEAVX(_node.children[0], _simd, _type) + "=_mm" + _simd + "_div_" + _type + "(" + SSEAVX(_node.children[0], _simd, _type) + ", " + SSEAVX(_node.children[1], _simd, _type) + ")";
             case "(_*+)": return "_mm" + _simd + "_fnmadd_" + _type + "(" + SSEAVX(_node.children[0], _simd, _type) + ", " + SSEAVX(_node.children[1], _simd, _type) + ", " + SSEAVX(_node.children[2], _simd, _type) + ")";
             case "(_*-)": return "_mm" + _simd + "_fnmsub_" + _type + "(" + SSEAVX(_node.children[0], _simd, _type) + ", " + SSEAVX(_node.children[1], _simd, _type) + ", " + SSEAVX(_node.children[2], _simd, _type) + ")";
             case "(*+)": return "_mm" + _simd + "_fmadd_" + _type + "(" + SSEAVX(_node.children[0], _simd, _type) + ", " + SSEAVX(_node.children[1], _simd, _type) + ", " + SSEAVX(_node.children[2], _simd, _type) + ")";

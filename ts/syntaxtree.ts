@@ -3,13 +3,7 @@
 //  Token[] -> Token(Syntax tree)
 const SyntaxTree = (_token : Token[]) : Token => {
     let stack : Token[] = [];
-    if (_token.length > 2 && (
-        _token[1].value === '=' || 
-        _token[1].value === '+=' || 
-        _token[1].value === '-=' || 
-        _token[1].value === '*=' || 
-        _token[1].value === '/='
-    )) {
+    if (_token.length > 2 && _token[1].value.match(/[+\-*/]?=/)) {
         stack.push(_token[0]);
         Expression(_token, 2, stack);
         Operate(_token[1], stack);
