@@ -33,6 +33,5 @@ const Lexical = (_str : string) : Token[] => {
             out.push(token);
         }
     }
-    console.log(out);
     return out;
 }

@@ -80,9 +80,22 @@ var Lexical = function (_str) {
 /// <reference path="lexical.ts">
 //  Token[] -> Token(Syntax tree)
 var SyntaxTree = function (_token) {
-    var idx = 0;
     var stack = [];
-    Expression(_token, idx, stack);
+    if (_token.length > 2 && (_token[1].value === '=' ||
+        _token[1].value === '+=' ||
+        _token[1].value === '-=' ||
+        _token[1].value === '*=' ||
+        _token[1].value === '/=')) {
+        stack.push(_token[0]);
+        Expression(_token, 2, stack);
+        Operate(_token[1], stack);
+    }
+    else {
+        Expression(_token, 0, stack);
+    }
+    if (stack.length !== 1) {
+        throw new Error("Error in SyntaxTree : stack.length !== 1.");
+    }
     return stack[0];
 };
 var Expression = function (_token, _idx, _stack) {
@@ -129,11 +142,18 @@ var Factor = function (_token, _idx, _stack) {
 };
 var Operate = function (_op, _stack) {
     if (_op.kind === "operator" && _op.value === '_') {
+        if (_stack.length < 1) {
+            throw new Error("Error in SyntaxTree : stack.length < 1.");
+        }
         var b1 = _stack.pop();
         _op.children.push(b1);
         _stack.push(_op);
     }
     else {
+        if (_stack.length < 2) {
+            console.log(_stack);
+            throw new Error("Error in SyntaxTree : stack.length < 2.");
+        }
         var b2 = _stack.pop(), b1 = _stack.pop();
         _op.children.push(b1);
         _op.children.push(b2);
