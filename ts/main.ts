@@ -11,7 +11,7 @@ const $input_equation : HTMLInputElement = <HTMLInputElement>document.getElement
 const $output_equation : HTMLInputElement = <HTMLInputElement>document.getElementById('output_equation');
 const onChange = (event) : void => {
     if ($input_equation.value) {
-        let token : Token[] = Lexical($input_equation.value);
+        let token : Token[] = Lexical($input_equation.value.replace(/\s/g, ''));
         try {
             let tree : Token =  SyntaxTree(token);
             if ($form_fma.elements['radio_fma'].value === 'yes') {

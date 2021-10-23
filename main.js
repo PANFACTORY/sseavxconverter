@@ -47,7 +47,7 @@ var $input_equation = document.getElementById('input_equation');
 var $output_equation = document.getElementById('output_equation');
 var onChange = function (event) {
     if ($input_equation.value) {
-        var token = Lexical($input_equation.value);
+        var token = Lexical($input_equation.value.replace(/\s/g, ''));
         try {
             var tree = SyntaxTree(token);
             if ($form_fma.elements['radio_fma'].value === 'yes') {
