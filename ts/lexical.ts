@@ -14,7 +14,7 @@ const Lexical = (_str : string) : Token[] => {
             if (_str[i].match(/[+\-*/]/) && i + 1 < _str.length && _str[i + 1] === '=') {
                 out.push({ kind : "operator", value : _str[i] + _str[i + 1], children : [] });
                 ++i;
-            } else if (_str[i] === '-' && (out.length === 0 || out[out.length - 1].kind === "operator")) {
+            } else if (_str[i] === '-' && (out.length === 0 || out[out.length - 1].value.match(/[=+\-*/]/))) {
                 out.push({ kind : "operator", value : '_', children : [] });
             } else {
                 out.push({ kind : "operator", value : _str[i], children : [] });
@@ -33,5 +33,6 @@ const Lexical = (_str : string) : Token[] => {
             out.push(token);
         }
     }
+    console.log(out);
     return out;
 }
