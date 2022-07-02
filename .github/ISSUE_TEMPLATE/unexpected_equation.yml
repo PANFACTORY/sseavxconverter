@@ -1,6 +1,9 @@
-name: Bug Report
+name: Report equation causing unexpected result
 description: File a bug report
 title: "Report equation causing unexpected result"
+labels: ["bug",]
+assignees:
+  - PANFACTORY
 body:
   - type: markdown
     attributes:
