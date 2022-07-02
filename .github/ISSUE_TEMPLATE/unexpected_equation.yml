@@ -52,9 +52,9 @@ body:
     validations:
       required: true
   - type: checkboxes
-    id: terms
+    id: disclaimer
     attributes:
-      label: terms
+      label: Disclaimer
       description: 
       options:
         - label: I will not sue for any event that may result from the submission of this issue.
