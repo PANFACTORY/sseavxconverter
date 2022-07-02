@@ -54,7 +54,7 @@ body:
   - type: checkboxes
     id: terms
     attributes:
-      label: 
+      label: terms
       description: 
       options:
         - label: I will not sue for any event that may result from the submission of this issue.
