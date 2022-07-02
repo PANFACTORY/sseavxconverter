@@ -1,0 +1,61 @@
+name: Report equation causing unexpected result
+description: File a bug report
+title: "Report equation causing unexpected result"
+labels: ["bug",]
+assignees:
+  - PANFACTORY
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+  - type: input
+    id: equation
+    attributes:
+      label: Equation
+      description: Please copy and paste here an equation you typed in "Original equation".
+      placeholder: ex. a*(b+c)-d
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: Result
+      description: Please copy and paste a result you got in "SSE/AVX intrinsic".
+      placeholder: If you got nothing, please type "Blank".
+      value: "Blank"
+    validations:
+      required: true
+  - type: textarea
+    id: log
+    attributes:
+      label: Relevant log output
+      description: Please copy and paste logs in console of developper tool.
+      render: shell
+  - type: dropdown
+    id: browser
+    attributes:
+      label: Browser
+      description: Select a browser you used.
+      options:
+        - Google Chrome
+        - Safari
+        - Mozilla Firefox
+        - Microsoft Edge
+        - Internet Explorer
+        - Opera
+        - QQ
+        - Sogou Explorer
+        - Yandex
+        - Brave
+        - Other
+    validations:
+      required: true
+  - type: checkboxes
+    id: disclaimer
+    attributes:
+      label: Disclaimer
+      description: 
+      options:
+        - label: I will not sue for any event that may result from the submission of this issue.
+          required: true
