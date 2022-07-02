@@ -1,122 +1,130 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="utf-8">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
-    <link href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" rel="stylesheet">
-    <title>SSE/AVX converter</title>
-</head>
-<body>
-    <nav class="navbar navbar-dark bg-dark">
-        <a href="#" class="navbar-brand">SSE/AVX converter</a>
-    </nav>
+    <head>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+        <link href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" rel="stylesheet">
+        <title>SSE/AVX converter</title>
+    </head>
+    <body>
+        <nav class="navbar navbar-dark bg-dark">
+            <a href="#" class="navbar-brand">SSE/AVX converter</a>
+        </nav>
 
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col">
-                <div class="card border-secondary m-4 p-2">
-                    <div class="card-body">
-                        <h5 class="card-title">SSE/AVX/AVX2/AVX512</h5>
-                    </div>
-                    <p class="card-text">Select SIMD extension you use.</p>
-                    <form class="form-inline" id="form_sseavx">
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="radio_sseavx" id="radio_sse" value="">
-                            <label class="form-check-label" for="radio_sse">SSE</label>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col">
+                    <div class="card border-secondary m-4 p-2">
+                        <div class="card-body">
+                            <h5 class="card-title">SSE/AVX/AVX2/AVX512</h5>
                         </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="radio_sseavx" id="radio_avx" value="256" checked>
-                            <label class="form-check-label" for="radio_avx">AVX/AVX2</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="radio_sseavx" id="radio_avx512" value="512">
-                            <label class="form-check-label" for="radio_avx512">AVX512</label>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <div class="col">
-                <div class="card border-secondary my-4 p-2">
-                    <div class="card-body">
-                        <h5 class="card-title">FMA</h5>
-                    </div>
-                    <p class="card-text">Apply Fused Multiply and Add.</p>
-                    <form class="form-inline" id="form_fma">
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="radio_fma" id="radio_fma_yes" value='yes'>
-                            <label class="form-check-label" for="radio_fma_yes">Yes</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="radio_fma" id="radio_fma_no" value='no' checked>
-                            <label class="form-check-label" for="radio_fma_no">No</label>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <div class="col">
-                <div class="card border-secondary m-4 p-2">
-                    <div class="card-body">
-                        <h5 class="card-title">Data type</h5>
-                    </div>
-                    <p class="card-text">Select data type you use.</p>
-                    <form class="form-inline" id="form_type">
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="radio_type" id="radio_float" value="ps">
-                            <label class="form-check-label" for="radio_float">float</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="radio_type" id="radio_double" value="pd" checked>
-                            <label class="form-check-label" for="radio_double">double</label>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col">
-                <div class="card border-secondary mx-4 p-2">
-                    <div class="card-body">
-                        <h5 class="card-title">Original equation</h5>
-                    </div>
-                    <p class="card-text">Input your equation with infix notation.</p>
-                    <div class="input-group mb-2">
-                        <div class="input-group-prepend">
-                            <div class="input-group-text">
-                                <button type="button" class="btn btn-outline-danger" id="button_delete">
-                                    <i id="icon_delete" class="fas fa-times"></i>
-                                </button>
+                        <p class="card-text">Select SIMD extension you use.</p>
+                        <form class="form-inline" id="form_sseavx">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="radio_sseavx" id="radio_sse" value="">
+                                <label class="form-check-label" for="radio_sse">SSE</label>
                             </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="radio_sseavx" id="radio_avx" value="256" checked>
+                                <label class="form-check-label" for="radio_avx">AVX/AVX2</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="radio_sseavx" id="radio_avx512" value="512">
+                                <label class="form-check-label" for="radio_avx512">AVX512</label>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="card border-secondary my-4 p-2">
+                        <div class="card-body">
+                            <h5 class="card-title">FMA</h5>
                         </div>
-                        <input type="text" class="card-text form-control" id="input_equation" placeholder="For example : c=-a*(b+c)"/>
+                        <p class="card-text">Apply Fused Multiply and Add.</p>
+                        <form class="form-inline" id="form_fma">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="radio_fma" id="radio_fma_yes" value='yes'>
+                                <label class="form-check-label" for="radio_fma_yes">Yes</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="radio_fma" id="radio_fma_no" value='no' checked>
+                                <label class="form-check-label" for="radio_fma_no">No</label>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="card border-secondary m-4 p-2">
+                        <div class="card-body">
+                            <h5 class="card-title">Data type</h5>
+                        </div>
+                        <p class="card-text">Select data type you use.</p>
+                        <form class="form-inline" id="form_type">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="radio_type" id="radio_float" value="ps">
+                                <label class="form-check-label" for="radio_float">float</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="radio_type" id="radio_double" value="pd" checked>
+                                <label class="form-check-label" for="radio_double">double</label>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <div class="card border-secondary mx-4 p-2">
+                        <div class="card-body">
+                            <h5 class="card-title">Original equation</h5>
+                        </div>
+                        <p class="card-text">Input your equation with infix notation.</p>
+                        <div class="input-group mb-2">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">
+                                    <button type="button" class="btn btn-outline-danger" id="button_delete">
+                                        <i id="icon_delete" class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <input type="text" class="card-text form-control" id="input_equation" placeholder="For example : c=-a*(b+c)"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <div class="card border-secondary m-4 p-2">
+                        <div class="card-body">
+                            <h5 class="card-title">SSE/AVX intrinsic</h5>
+                        </div>
+                        <div class="input-group mb-2">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">
+                                    <button type="button" class="btn btn-outline-primary" id="button_copy">
+                                        <i id="icon_copy" class="fas fa-file-export"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <textarea id="output_equation" class="card-text form-control" readonly></textarea>
+                        </div>                    
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <div class="card border-secondary mx-4 p-2">
+                        <a class="btn btn-danger" target="_blank" href="https://github.com/PANFACTORY/sseavxconverter/issues/new?assignees=PANFACTORY&labels=bug&template=unexpected_equation.yml&title=Report+equation+causing+unexpected+result" role="button">Report an equation causing unexpected result</a>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="row">
-            <div class="col">
-                <div class="card border-secondary m-4 p-2">
-                    <div class="card-body">
-                        <h5 class="card-title">SSE/AVX intrinsic</h5>
-                    </div>
-                    <div class="input-group mb-2">
-                        <div class="input-group-prepend">
-                            <div class="input-group-text">
-                                <button type="button" class="btn btn-outline-primary" id="button_copy">
-                                    <i id="icon_copy" class="fas fa-file-export"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <textarea id="output_equation" class="card-text form-control" readonly></textarea>
-                    </div>                    
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <script src="main.js"></script>
-</body>
+        <script src="main.js"></script>
+    </body>
 </html>
