@@ -1,6 +1,6 @@
 name: Bug Report
 description: File a bug report
-title: "[Bug]: "
+title: "Report equation causing unexpected result"
 labels: ["bug", "triage"]
 assignees:
   - octocat
@@ -10,53 +10,52 @@ body:
       value: |
         Thanks for taking the time to fill out this bug report!
   - type: input
-    id: contact
+    id: equation
     attributes:
-      label: Contact Details
-      description: さらに情報が必要な場合、どのように連絡すればよいでしょうか？
-      placeholder: ex. email@example.com
-    validations:
-      required: false
-  - type: textarea
-    id: what-happened
-    attributes:
-      label: What happened?
-      description: また、生じると期待されていたことは何でしょうか？
-      placeholder: Tell us what you see!
-      value: "バグが生じました!"
+      label: Equation
+      description: Please copy and paste here an equation you typed in "Original equation".
+      placeholder: ex. a*(b+c)-d
     validations:
       required: true
-  - type: dropdown
-    id: version
+  - type: textarea
+    id: result
     attributes:
-      label: Version
-      description: 実行していたソフトウェアのバージョンは?
-      options:
-        - 1.0.2 (Default)
-        - 1.0.3 (Edge)
+      label: Result
+      description: Please copy and paste a result you got in "SSE/AVX intrinsic".
+      placeholder: If you got nothing, please type "Blank".
+      value: "Blank"
     validations:
       required: true
-  - type: dropdown
-    id: browsers
-    attributes:
-      label: What browsers are you seeing the problem on?
-      multiple: true
-      options:
-        - Firefox
-        - Chrome
-        - Safari
-        - Microsoft Edge
   - type: textarea
-    id: logs
+    id: log
     attributes:
       label: Relevant log output
-      description: 関連するログの出力をコピーしてペーストしてください。 これは自動的にコードにフォーマットされるので、バックティックは不要です。
+      description: Please copy and paste logs in console of developper tool.
       render: shell
+  - type: dropdown
+    id: browser
+    attributes:
+      label: Browser
+      description: Select a browser you used.
+      options:
+        - Google Chrome
+        - Safari
+        - Mozilla Firefox
+        - Microsoft Edge
+        - Internet Explorer
+        - Opera
+        - QQ
+        - Sogou Explorer
+        - Yandex
+        - Brave
+        - Other
+    validations:
+      required: true
   - type: checkboxes
     id: terms
     attributes:
-      label: Code of Conduct
-      description: このIssueをサブミットすることで、あなたは私たちの [行動規範](https://example.com)に同意したことになります。
+      label: 
+      description: 
       options:
-        - label: I agree to follow this project's Code of Conduct
+        - label: I will not sue for any event that may result from the submission of this issue.
           required: true
